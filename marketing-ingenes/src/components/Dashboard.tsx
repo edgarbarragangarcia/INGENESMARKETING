@@ -1,13 +1,15 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { authService } from '@/lib/supabase';
+import { authService, supabase } from '@/lib/supabase';
+import OrganizationModal from './OrganizationModal';
 
 const Dashboard: React.FC = () => {
   const [activeSection, setActiveSection] = useState('dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [theme, setTheme] = useState('system');
+  const [isOrganizationModalOpen, setIsOrganizationModalOpen] = useState(false);
 
   const handleNavClick = (section: string) => {
     setActiveSection(section);
@@ -38,6 +40,99 @@ const Dashboard: React.FC = () => {
       // System theme
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       root.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+    }
+  };
+
+  const handleOrganizationSubmit = async (data: any) => {
+    try {
+      const user = await authService.getCurrentUser();
+      
+      if (!user) {
+        console.error('Usuario no autenticado');
+        return;
+      }
+
+      // Crear organización
+      const organizationData = {
+        name: data.name,
+        mission: data.mission,
+        vision: data.vision,
+        strategic_objectives: data.strategicObjectives.filter((obj: string) => obj.trim() !== ''),
+        created_by: user.id
+      };
+
+      const { data: organization, error: orgError } = await supabase
+        .from('organizations')
+        .insert([organizationData])
+        .select()
+        .single();
+
+      if (orgError) {
+        console.error('Error al crear organización:', orgError);
+        return;
+      }
+
+      // Crear buyer persona si hay datos
+      if (data.personaName) {
+        const personaData = {
+          organization_id: organization.id,
+          name: data.personaName,
+          age_range: data.ageRange,
+          gender: data.gender,
+          occupation: data.occupation,
+          income_level: data.incomeLevel,
+          education_level: data.educationLevel,
+          location: data.location,
+          pain_points: data.painPoints.filter((point: string) => point.trim() !== ''),
+          goals: data.goals.filter((goal: string) => goal.trim() !== ''),
+          preferred_channels: data.preferredChannels.filter((channel: string) => channel.trim() !== ''),
+          behavior_patterns: data.behaviorPatterns,
+          motivations: data.motivations,
+          frustrations: data.frustrations
+        };
+
+        const { error: personaError } = await supabase
+          .from('buyer_personas')
+          .insert([personaData]);
+
+        if (personaError) {
+          console.error('Error al crear buyer persona:', personaError);
+        }
+      }
+
+      // Crear producto si hay datos
+      if (data.productName) {
+        const productData = {
+          organization_id: organization.id,
+          name: data.productName,
+          description: data.productDescription,
+          category: data.category,
+          price: data.price ? parseFloat(data.price) : null,
+          currency: data.currency,
+          target_audience: data.targetAudience.filter((audience: string) => audience.trim() !== ''),
+          key_benefits: data.keyBenefits.filter((benefit: string) => benefit.trim() !== ''),
+          features: data.features.filter((feature: string) => feature.trim() !== ''),
+          competitive_advantages: data.competitiveAdvantages.filter((advantage: string) => advantage.trim() !== ''),
+          status: data.status
+        };
+
+        const { error: productError } = await supabase
+          .from('products')
+          .insert([productData]);
+
+        if (productError) {
+          console.error('Error al crear producto:', productError);
+        }
+      }
+
+      console.log('Organización creada exitosamente:', organization);
+      setIsOrganizationModalOpen(false);
+      
+      // Opcional: Recargar la página o actualizar la lista de organizaciones
+      window.location.reload();
+      
+    } catch (error) {
+      console.error('Error al crear organización:', error);
     }
   };
 
@@ -1356,7 +1451,10 @@ const Dashboard: React.FC = () => {
                       <i className="fas fa-building"></i>
                       Organizaciones
                     </h1>
-                    <button className="btn-primary">
+                    <button 
+                      className="btn-primary"
+                      onClick={() => setIsOrganizationModalOpen(true)}
+                    >
                       <i className="fas fa-plus"></i>
                       Nueva Organización
                     </button>
@@ -1490,6 +1588,13 @@ const Dashboard: React.FC = () => {
           </div>
         </main>
       </div>
+      
+      {/* Modal de Nueva Organización */}
+      <OrganizationModal
+        isOpen={isOrganizationModalOpen}
+        onClose={() => setIsOrganizationModalOpen(false)}
+        onSubmit={handleOrganizationSubmit}
+      />
     </>
   );
 };

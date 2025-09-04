@@ -71,35 +71,33 @@ function redirectToLogin() {
 
 // Initialize Navigation
 function initializeNavigation() {
-    const navItems = document.querySelectorAll('.nav-item a');
-    const contentSections = document.querySelectorAll('.content-section');
+    const navLinks = document.querySelectorAll('.nav-link');
+    const sections = document.querySelectorAll('.content-section');
     
-    navItems.forEach(item => {
-        item.addEventListener('click', function(e) {
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
             e.preventDefault();
             
-            // Remove active class from all nav items
-            document.querySelectorAll('.nav-item').forEach(nav => {
+            // Remove active class from all nav links
+            navLinks.forEach(nav => {
                 nav.classList.remove('active');
             });
             
-            // Add active class to clicked item
-            this.parentElement.classList.add('active');
+            // Add active class to clicked link
+            this.classList.add('active');
             
-            // Hide all content sections
-            contentSections.forEach(section => {
-                section.classList.remove('active');
+            // Hide all sections
+            sections.forEach(section => {
+                section.style.display = 'none';
             });
             
-            // Show target section
+            // Show selected section
             const targetSection = this.getAttribute('data-section');
-            const targetElement = document.getElementById(targetSection + '-section');
-            if (targetElement) {
-                targetElement.classList.add('active');
+            const section = document.getElementById(targetSection);
+            if (section) {
+                section.style.display = 'block';
+                loadSectionData(targetSection);
             }
-            
-            // Load section-specific data
-            loadSectionData(targetSection);
         });
     });
 }

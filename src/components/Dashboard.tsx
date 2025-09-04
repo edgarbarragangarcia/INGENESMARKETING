@@ -50,7 +50,6 @@ const Dashboard: React.FC = () => {
   const [activeSection, setActiveSection] = useState('dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const [theme, setTheme] = useState('system');
   const [isOrganizationModalOpen, setIsOrganizationModalOpen] = useState(false);
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [loading, setLoading] = useState(true);
@@ -70,24 +69,7 @@ const Dashboard: React.FC = () => {
     setIsUserMenuOpen(!isUserMenuOpen);
   };
 
-  const handleThemeChange = (newTheme: string) => {
-    setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
-    applyTheme(newTheme);
-  };
 
-  const applyTheme = (selectedTheme: string) => {
-    const root = document.documentElement;
-    if (selectedTheme === 'dark') {
-      root.setAttribute('data-theme', 'dark');
-    } else if (selectedTheme === 'light') {
-      root.setAttribute('data-theme', 'light');
-    } else {
-      // System theme
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      root.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
-    }
-  };
 
   const loadOrganizations = async () => {
     try {
@@ -290,10 +272,6 @@ const Dashboard: React.FC = () => {
   };
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') || 'system';
-    setTheme(savedTheme);
-    applyTheme(savedTheme);
-    
     // Restaurar la sección activa desde localStorage
     const savedSection = localStorage.getItem('activeSection') || 'dashboard';
     setActiveSection(savedSection);
@@ -1357,33 +1335,6 @@ const Dashboard: React.FC = () => {
                 
                 {isUserMenuOpen && (
                   <div className="user-dropdown">
-                    <div className="dropdown-section">
-                      <h4>Tema</h4>
-                      <div className="theme-options">
-                        <button 
-                          className={`theme-btn ${theme === 'light' ? 'active' : ''}`}
-                          onClick={() => handleThemeChange('light')}
-                        >
-                          <i className="fas fa-sun"></i>
-                          Claro
-                        </button>
-                        <button 
-                          className={`theme-btn ${theme === 'dark' ? 'active' : ''}`}
-                          onClick={() => handleThemeChange('dark')}
-                        >
-                          <i className="fas fa-moon"></i>
-                          Oscuro
-                        </button>
-                        <button 
-                          className={`theme-btn ${theme === 'system' ? 'active' : ''}`}
-                          onClick={() => handleThemeChange('system')}
-                        >
-                          <i className="fas fa-desktop"></i>
-                          Sistema
-                        </button>
-                      </div>
-                    </div>
-                    <div className="dropdown-divider"></div>
                     <button className="logout-btn" onClick={handleLogout}>
                       <i className="fas fa-sign-out-alt"></i>
                       Cerrar Sesión

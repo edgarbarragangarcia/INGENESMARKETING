@@ -29,12 +29,18 @@
 /* Modal Header */
 .modalHeader {
   padding: 24px 32px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: linear-gradient(135deg, 
+    rgba(255, 182, 193, 0.3) 0%,
+    rgba(173, 216, 230, 0.3) 25%,
+    rgba(221, 160, 221, 0.3) 50%,
+    rgba(255, 218, 185, 0.3) 75%,
+    rgba(240, 248, 255, 0.3) 100%);
+  backdrop-filter: blur(15px);
+  color: #1e293b;
 }
 
 .modalHeader h2 {
@@ -44,13 +50,27 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  color: #374151;
+  color: #1e293b;
+}
+
+.modalHeader h2 i {
+  animation: headerIconSpin 4s linear infinite;
+  color: #3b82f6;
+}
+
+@keyframes headerIconSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .closeBtn {
   background: none;
   border: none;
-  color: white;
+  color: #1e293b;
   font-size: 18px;
   cursor: pointer;
   padding: 8px;
@@ -59,7 +79,7 @@
 }
 
 .closeBtn:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(30, 41, 59, 0.1);
 }
 
 /* Modal Tabs */
@@ -78,12 +98,31 @@
   font-weight: 600;
   color: #374151;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   border-bottom: 3px solid transparent;
+}
+
+.tabBtn i {
+  transition: all 0.3s ease;
+  animation: tabIconFloat 3s ease-in-out infinite;
+}
+
+.tabBtn:hover i {
+  transform: translateY(-2px) scale(1.1);
+  color: #3b82f6;
+}
+
+@keyframes tabIconFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-1px);
+  }
 }
 
 .tabBtn:hover {
@@ -173,8 +212,27 @@
 }
 
 .formGroup label i {
-  color: #6b7280;
+  color: #3b82f6;
   width: 16px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  animation: iconPulse 2s ease-in-out infinite;
+}
+
+.formGroup label i:hover {
+  color: #1d4ed8;
+  transform: scale(1.2) rotate(5deg);
+}
+
+@keyframes iconPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
 }
 
 .formGroup input,
@@ -305,11 +363,26 @@
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   gap: 8px;
   border: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.btnPrimary i,
+.btnSecondary i {
+  transition: all 0.3s ease;
+}
+
+.btnPrimary:hover i {
+  transform: scale(1.2) rotate(10deg);
+}
+
+.btnSecondary:hover i {
+  transform: scale(1.1) rotate(-5deg);
 }
 
 .btnPrimary {

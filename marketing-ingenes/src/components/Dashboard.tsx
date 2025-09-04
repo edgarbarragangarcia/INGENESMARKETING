@@ -1632,8 +1632,12 @@ const Dashboard: React.FC = () => {
       {/* Modal de Nueva Organización */}
       <OrganizationModal
         isOpen={isOrganizationModalOpen}
-        onClose={() => setIsOrganizationModalOpen(false)}
+        onClose={() => {
+          setIsOrganizationModalOpen(false);
+          setEditingOrganization(null);
+        }}
         onSubmit={handleOrganizationSubmit}
+        editingOrganization={editingOrganization}
       />
     </>
   );

@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './OrganizationModal.module.css';
 
 interface OrganizationModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: any) => void;
+  editingOrganization?: any;
 }
 
-const OrganizationModal: React.FC<OrganizationModalProps> = ({ isOpen, onClose, onSubmit }) => {
+const OrganizationModal: React.FC<OrganizationModalProps> = ({ isOpen, onClose, onSubmit, editingOrganization }) => {
   const [activeTab, setActiveTab] = useState('organization');
   const [formData, setFormData] = useState({
     // Organización
@@ -88,6 +89,78 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ isOpen, onClose, 
     onSubmit(formData);
   };
 
+  // Cargar datos cuando se está editando
+  useEffect(() => {
+    if (editingOrganization) {
+      setFormData({
+        // Organización
+        name: editingOrganization.name || '',
+        mission: editingOrganization.mission || '',
+        vision: editingOrganization.vision || '',
+        strategicObjectives: editingOrganization.strategic_objectives || [''],
+        logo: null,
+        
+        // Buyer Persona - valores por defecto
+        personaName: '',
+        ageRange: '',
+        gender: '',
+        occupation: '',
+        incomeLevel: '',
+        educationLevel: '',
+        location: '',
+        painPoints: [''],
+        goals: [''],
+        preferredChannels: [''],
+         behaviorPatterns: '',
+         motivations: '',
+         frustrations: '',
+         personaAvatar: null,
+        
+        // Productos - valores por defecto
+        productName: '',
+        productDescription: '',
+        category: '',
+        price: '',
+        currency: 'MXN',
+        status: 'active'
+      });
+    } else {
+      // Resetear formulario para nueva organización
+      setFormData({
+        // Organización
+        name: '',
+        mission: '',
+        vision: '',
+        strategicObjectives: [''],
+        logo: null,
+        
+        // Buyer Persona
+        personaName: '',
+        ageRange: '',
+        gender: '',
+        occupation: '',
+        incomeLevel: '',
+        educationLevel: '',
+        location: '',
+        painPoints: [''],
+        goals: [''],
+        preferredChannels: [''],
+         behaviorPatterns: '',
+         motivations: '',
+         frustrations: '',
+         personaAvatar: null,
+        
+        // Productos
+        productName: '',
+        productDescription: '',
+        category: '',
+        price: '',
+        currency: 'MXN',
+        status: 'active'
+      });
+    }
+  }, [editingOrganization, isOpen]);
+
   if (!isOpen) return null;
 
   return (
@@ -95,11 +168,11 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ isOpen, onClose, 
       <div className={styles.organizationModal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.modalHeader}>
           <h2>
-            <i className="fas fa-building"></i>
-            Nueva Organización
+            <i className="fas fa-rocket"></i>
+            {editingOrganization ? 'Editar Organización' : 'Nueva Organización'}
           </h2>
           <button className={styles.closeBtn} onClick={onClose}>
-            <i className="fas fa-times"></i>
+            <i className="fas fa-times-circle"></i>
           </button>
         </div>
 
@@ -108,21 +181,21 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ isOpen, onClose, 
             className={`${styles.tabBtn} ${activeTab === 'organization' ? styles.active : ''}`}
             onClick={() => setActiveTab('organization')}
           >
-            <i className="fas fa-building"></i>
+            <i className="fas fa-city"></i>
             Organización
           </button>
           <button 
             className={`${styles.tabBtn} ${activeTab === 'persona' ? styles.active : ''}`}
             onClick={() => setActiveTab('persona')}
           >
-            <i className="fas fa-user-tie"></i>
+            <i className="fas fa-user-astronaut"></i>
             Buyer Persona
           </button>
           <button 
             className={`${styles.tabBtn} ${activeTab === 'products' ? styles.active : ''}`}
             onClick={() => setActiveTab('products')}
           >
-            <i className="fas fa-box"></i>
+            <i className="fas fa-cube"></i>
             Productos
           </button>
         </div>
@@ -135,7 +208,7 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ isOpen, onClose, 
                 <div className={styles.formRow}>
                   <div className={styles.formGroup}>
                     <label htmlFor="name">
-                      <i className="fas fa-building"></i>
+                      <i className="fas fa-hospital"></i>
                       Nombre de la Organización
                     </label>
                     <input
@@ -151,7 +224,7 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ isOpen, onClose, 
                 <div className={styles.formRow}>
                   <div className={styles.formGroup}>
                     <label htmlFor="mission">
-                      <i className="fas fa-bullseye"></i>
+                      <i className="fas fa-compass"></i>
                       Misión
                     </label>
                     <textarea
@@ -167,7 +240,7 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ isOpen, onClose, 
                 <div className={styles.formRow}>
                   <div className={styles.formGroup}>
                     <label htmlFor="vision">
-                      <i className="fas fa-eye"></i>
+                      <i className="fas fa-telescope"></i>
                       Visión
                     </label>
                     <textarea
@@ -182,7 +255,7 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ isOpen, onClose, 
 
                 <div className={styles.formGroup}>
                   <label>
-                    <i className="fas fa-list-ul"></i>
+                    <i className="fas fa-chess-queen"></i>
                     Objetivos Estratégicos
                   </label>
                   {formData.strategicObjectives.map((objective, index) => (
@@ -651,12 +724,12 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ isOpen, onClose, 
 
           <div className={styles.modalActions}>
             <button type="button" className={styles.btnSecondary} onClick={onClose}>
-              <i className="fas fa-times"></i>
+              <i className="fas fa-arrow-left"></i>
               Cancelar
             </button>
             <button type="submit" className={styles.btnPrimary}>
-              <i className="fas fa-save"></i>
-              Guardar Organización
+              <i className="fas fa-rocket"></i>
+              {editingOrganization ? 'Actualizar Organización' : 'Guardar Organización'}
             </button>
           </div>
         </form>

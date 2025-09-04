@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://demo.supabase.co'
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'demo-key'
@@ -7,7 +7,7 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'demo-key'
 export const supabase = (() => {
   try {
     return createClient(supabaseUrl, supabaseAnonKey)
-  } catch (error) {
+  } catch {
     console.warn('Supabase no configurado correctamente. Usando modo demo.');
     // Retornar un objeto mock para desarrollo
     return {
@@ -18,8 +18,14 @@ export const supabase = (() => {
         signOut: () => Promise.resolve({ error: null }),
         getUser: () => Promise.resolve({ data: { user: null }, error: null }),
         onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } })
-      }
-    } as any
+      },
+      from: () => ({
+        select: () => Promise.resolve({ data: [], error: null }),
+        insert: () => Promise.resolve({ data: null, error: null }),
+        update: () => Promise.resolve({ data: null, error: null }),
+        delete: () => Promise.resolve({ data: null, error: null })
+      })
+    } as unknown as SupabaseClient
   }
 })()
 
@@ -124,7 +130,7 @@ export const authService = {
 
   // Escuchar cambios de autenticación
   onAuthStateChange(callback: (user: AuthUser | null) => void) {
-    return supabase.auth.onAuthStateChange((event: any, session: any) => {
+    return supabase.auth.onAuthStateChange((event, session) => {
       callback(session?.user as AuthUser || null)
     })
   }

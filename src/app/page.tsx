@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Dashboard from '@/components/Dashboard';
-import { authService, AuthUser } from '@/lib/supabase';
+import { authService } from '@/lib/supabase';
 
 function LandingPage() {
   const [showLoginModal, setShowLoginModal] = useState(false);

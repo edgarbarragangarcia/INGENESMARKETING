@@ -1,8 +1,50 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { authService, supabase } from '@/lib/supabase';
 import OrganizationModal from './OrganizationModal';
+
+interface Organization {
+  id: string;
+  name: string;
+  mission: string;
+  vision: string;
+  strategic_objectives: string[];
+  logo_url?: string;
+  created_by: string;
+  created_at: string;
+}
+
+interface OrganizationFormData {
+  name: string;
+  mission: string;
+  vision: string;
+  strategicObjectives: string[];
+  logo: File | null;
+  // Buyer Persona fields
+  personaName: string;
+  ageRange: string;
+  gender: string;
+  occupation: string;
+  incomeLevel: string;
+  educationLevel: string;
+  location: string;
+  painPoints: string[];
+  goals: string[];
+  preferredChannels: string[];
+  behaviorPatterns: string;
+  motivations: string;
+  frustrations: string;
+  personaAvatar: File | null;
+  // Product fields
+  productName: string;
+  productDescription: string;
+  category: string;
+  price: string;
+  currency: string;
+  status: string;
+}
 
 const Dashboard: React.FC = () => {
   const [activeSection, setActiveSection] = useState('dashboard');
@@ -10,9 +52,9 @@ const Dashboard: React.FC = () => {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [theme, setTheme] = useState('system');
   const [isOrganizationModalOpen, setIsOrganizationModalOpen] = useState(false);
-  const [organizations, setOrganizations] = useState<any[]>([]);
+  const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editingOrganization, setEditingOrganization] = useState<any>(null);
+  const [editingOrganization, setEditingOrganization] = useState<Organization | null>(null);
 
   const handleNavClick = (section: string) => {
     setActiveSection(section);
@@ -80,7 +122,7 @@ const Dashboard: React.FC = () => {
     loadOrganizations();
   }, []);
 
-  const handleEditOrganization = (organization: any) => {
+  const handleEditOrganization = (organization: Organization) => {
     setEditingOrganization(organization);
     setIsOrganizationModalOpen(true);
   };
@@ -105,7 +147,7 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handleOrganizationSubmit = async (data: any) => {
+  const handleOrganizationSubmit = async (data: OrganizationFormData) => {
     try {
       const user = await authService.getCurrentUser();
       
@@ -164,9 +206,9 @@ const Dashboard: React.FC = () => {
           income_level: data.incomeLevel,
           education_level: data.educationLevel,
           location: data.location,
-          pain_points: data.painPoints.filter((point: string) => point.trim() !== ''),
-          goals: data.goals.filter((goal: string) => goal.trim() !== ''),
-          preferred_channels: data.preferredChannels.filter((channel: string) => channel.trim() !== ''),
+          pain_points: data.painPoints?.filter((point: string) => point.trim() !== '') || [],
+          goals: data.goals?.filter((goal: string) => goal.trim() !== '') || [],
+          preferred_channels: data.preferredChannels?.filter((channel: string) => channel.trim() !== '') || [],
           behavior_patterns: data.behaviorPatterns,
           motivations: data.motivations,
           frustrations: data.frustrations
@@ -1299,9 +1341,11 @@ const Dashboard: React.FC = () => {
             <div className="header-actions">
               <div className="user-avatar-container">
                 <div className="user-avatar" onClick={toggleUserMenu}>
-                  <img 
+                  <Image 
                     src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face" 
                     alt="Usuario" 
+                    width={40}
+                    height={40}
                     className="avatar-image"
                   />
                   <div className="user-info">

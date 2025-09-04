@@ -1,11 +1,50 @@
 import React, { useState, useEffect } from 'react';
 import styles from './OrganizationModal.module.css';
 
+interface Organization {
+  id: string;
+  name: string;
+  mission: string;
+  vision: string;
+  strategic_objectives: string[];
+  logo_url?: string;
+  created_by: string;
+  created_at: string;
+}
+
+interface FormData {
+  name: string;
+  mission: string;
+  vision: string;
+  strategicObjectives: string[];
+  logo: File | null;
+  personaName: string;
+  ageRange: string;
+  gender: string;
+  occupation: string;
+  incomeLevel: string;
+  educationLevel: string;
+  location: string;
+  painPoints: string[];
+  goals: string[];
+  preferredChannels: string[];
+  behaviorPatterns: string;
+  motivations: string;
+  frustrations: string;
+  personaAvatar: File | null;
+  productName: string;
+  productDescription: string;
+  category: string;
+  price: string;
+  currency: string;
+  status: string;
+}
+
 interface OrganizationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: any) => void;
-  editingOrganization?: any;
+  onSubmit: (data: FormData) => void;
+  editingOrganization?: Organization | null;
 }
 
 const OrganizationModal: React.FC<OrganizationModalProps> = ({ isOpen, onClose, onSubmit, editingOrganization }) => {
@@ -44,7 +83,7 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ isOpen, onClose, 
     status: 'active'
   });
 
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = (field: keyof FormData, value: string | string[] | File | null) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -75,7 +114,7 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ isOpen, onClose, 
       const currentArray = prev[field as keyof typeof prev] as string[];
       return {
         ...prev,
-        [field]: currentArray.filter((_: any, i: number) => i !== index)
+        [field]: currentArray.filter((_: string, i: number) => i !== index)
       };
     });
   };

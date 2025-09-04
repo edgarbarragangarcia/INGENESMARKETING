@@ -1303,7 +1303,7 @@ const Dashboard: React.FC = () => {
                 onClick={() => handleNavClick('analytics')}
               >
                 <i className="fas fa-chart-bar"></i>
-                <span>Analíticas</span>
+                <span>Concepto Creativo</span>
               </a>
               <a 
                 href="#patients" 

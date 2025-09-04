@@ -9,8 +9,9 @@ function LandingPage() {
   // Escuchar cambios de autenticación
   useEffect(() => {
     const { data: { subscription } } = authService.onAuthStateChange((user) => {
-      if (user && window.location.hash === '') {
-        // Si el usuario se autentica y está en la página principal, ir al dashboard
+      const hash = window.location.hash;
+      if (user && (hash === '' || hash.startsWith('#dashboard'))) {
+        // Si el usuario se autentica, ir al dashboard
         const userData = JSON.stringify({
           id: user.id,
           email: user.email,
@@ -20,7 +21,9 @@ function LandingPage() {
         
         localStorage.setItem('userToken', user.id);
         localStorage.setItem('userData', userData);
-        window.location.hash = 'dashboard';
+        
+        // Limpiar la URL y redirigir al dashboard
+        window.history.replaceState(null, '', window.location.pathname + '#dashboard');
       }
     });
 
@@ -1423,12 +1426,17 @@ export default function Home() {
         // Verificar si hay una sesión activa
         const currentUser = await authService.getCurrentUser();
         
-        // Verificar el hash de la URL
-        const isDashboardHash = window.location.hash === '#dashboard';
+        // Verificar el hash de la URL (incluyendo parámetros de autenticación)
+        const hash = window.location.hash;
+        const isDashboardHash = hash === '#dashboard' || hash.startsWith('#dashboard');
         
         // Si hay usuario logueado y está en dashboard, o si hay hash de dashboard
         if ((currentUser && isDashboardHash) || isDashboardHash) {
           setShowDashboard(true);
+          // Limpiar la URL de parámetros de autenticación si existen
+          if (hash.includes('#access_token=') || hash.includes('&')) {
+            window.history.replaceState(null, '', window.location.pathname + '#dashboard');
+          }
         } else {
           setShowDashboard(false);
         }
@@ -1441,7 +1449,14 @@ export default function Home() {
     };
 
     const checkHash = () => {
-      setShowDashboard(window.location.hash === '#dashboard');
+      const hash = window.location.hash;
+      const isDashboardHash = hash === '#dashboard' || hash.startsWith('#dashboard');
+      setShowDashboard(isDashboardHash);
+      
+      // Limpiar la URL de parámetros de autenticación si existen
+      if (isDashboardHash && (hash.includes('#access_token=') || hash.includes('&'))) {
+        window.history.replaceState(null, '', window.location.pathname + '#dashboard');
+      }
     };
 
     // Inicializar la aplicación

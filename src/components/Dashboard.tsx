@@ -5,6 +5,26 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { authService, supabase } from '@/lib/supabase';
 import OrganizationModal from './OrganizationModal';
+import {
+  LogoIcon,
+  DashboardIcon,
+  OrganizationIcon,
+  CreativeIcon,
+  PatientsIcon,
+  SearchIcon,
+  AddIcon,
+  EditIcon,
+  DeleteIcon,
+  LogoutIcon,
+  ChevronDownIcon,
+  ProductIcon,
+  PersonaIcon,
+  AgeIcon,
+  OccupationIcon,
+  LocationIcon,
+  CheckIcon,
+  ChartIcon
+} from './Icons';
 
 
 interface Organization {
@@ -1643,6 +1663,10 @@ const Dashboard: React.FC = () => {
            animation: fadeIn 0.5s ease-out;
          }
          
+         .page-header.compact {
+           margin-bottom: 20px;
+         }
+         
          .page-description {
            font-size: 14px;
            color: #64748b;
@@ -1650,6 +1674,286 @@ const Dashboard: React.FC = () => {
            font-weight: 400;
          }
          
+         /* Estructura compacta */
+         .concepto-form-compact {
+           display: flex;
+           flex-direction: column;
+           gap: 20px;
+         }
+         
+         .form-section-compact {
+           background: rgba(255, 255, 255, 0.9);
+           border-radius: 12px;
+           padding: 16px;
+           border: 1px solid rgba(59, 130, 246, 0.1);
+           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+         }
+         
+         .section-title-compact {
+           font-size: 16px;
+           font-weight: 600;
+           color: #1e293b;
+           display: flex;
+           align-items: center;
+           gap: 8px;
+           margin: 0 0 12px 0;
+         }
+         
+         .section-title-compact i {
+           color: #3b82f6;
+           font-size: 14px;
+         }
+         
+         .optional {
+           font-size: 11px;
+           color: #64748b;
+           font-weight: 400;
+           margin-left: 8px;
+         }
+         
+         .form-select-compact {
+           width: 100%;
+           padding: 10px 12px;
+           border: 1px solid rgba(59, 130, 246, 0.2);
+           border-radius: 8px;
+           font-size: 14px;
+           background: rgba(255, 255, 255, 0.95);
+           color: #1e293b;
+           transition: all 0.2s ease;
+           cursor: pointer;
+         }
+         
+         .form-select-compact:focus {
+           outline: none;
+           border-color: #3b82f6;
+           box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+         }
+         
+         /* Layout de dos columnas */
+         .two-column-layout {
+           display: grid;
+           grid-template-columns: 1fr 1fr;
+           gap: 20px;
+         }
+         
+         /* Grids compactos */
+         .products-grid-compact,
+         .personas-grid-compact {
+           display: flex;
+           flex-direction: column;
+           gap: 8px;
+           max-height: 300px;
+           overflow-y: auto;
+         }
+         
+         .item-card-compact {
+           background: rgba(255, 255, 255, 0.95);
+           border: 1px solid rgba(59, 130, 246, 0.15);
+           border-radius: 8px;
+           padding: 12px;
+           cursor: pointer;
+           transition: all 0.2s ease;
+         }
+         
+         .item-card-compact:hover {
+           border-color: #3b82f6;
+           box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+           transform: translateY(-1px);
+         }
+         
+         .item-card-compact.selected {
+           border-color: #3b82f6;
+           background: rgba(59, 130, 246, 0.05);
+           box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+         }
+         
+         .item-header-compact {
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+           margin-bottom: 8px;
+         }
+         
+         .item-name {
+           font-size: 14px;
+           font-weight: 600;
+           color: #1e293b;
+           flex: 1;
+         }
+         
+         .item-header-compact input[type="checkbox"] {
+           width: 16px;
+           height: 16px;
+           accent-color: #3b82f6;
+           cursor: pointer;
+         }
+         
+         .item-details-compact {
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+           gap: 8px;
+         }
+         
+         .item-category {
+           padding: 2px 8px;
+           background: rgba(59, 130, 246, 0.1);
+           color: #3b82f6;
+           border-radius: 12px;
+           font-size: 11px;
+           font-weight: 600;
+         }
+         
+         .item-price {
+           font-size: 12px;
+           font-weight: 600;
+           color: #1e293b;
+         }
+         
+         /* Estilos específicos para personas */
+         .item-card-compact.persona {
+           border-left: 3px solid #10b981;
+         }
+         
+         .persona-info-compact {
+           display: flex;
+           flex-direction: column;
+           gap: 4px;
+         }
+         
+         .persona-info-compact span {
+           font-size: 12px;
+           color: #64748b;
+           display: flex;
+           align-items: center;
+           gap: 6px;
+         }
+         
+         .persona-info-compact i {
+           width: 12px;
+           color: #10b981;
+           font-size: 10px;
+         }
+         
+         .no-items-compact {
+           text-align: center;
+           padding: 20px;
+           color: #64748b;
+           font-size: 13px;
+           display: flex;
+           flex-direction: column;
+           align-items: center;
+           gap: 8px;
+         }
+         
+         .no-items-compact i {
+           font-size: 24px;
+           opacity: 0.5;
+         }
+         
+         /* Brief compacto */
+         .brief-container-compact {
+           position: relative;
+         }
+         
+         .brief-textarea-compact {
+           width: 100%;
+           padding: 12px;
+           border: 1px solid rgba(59, 130, 246, 0.2);
+           border-radius: 8px;
+           font-size: 14px;
+           font-family: inherit;
+           resize: vertical;
+           min-height: 80px;
+           background: rgba(255, 255, 255, 0.95);
+         }
+         
+         .brief-textarea-compact:focus {
+           outline: none;
+           border-color: #3b82f6;
+           box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+         }
+         
+         .brief-counter-compact {
+           position: absolute;
+           bottom: 8px;
+           right: 12px;
+           font-size: 11px;
+           color: #64748b;
+           background: rgba(255, 255, 255, 0.9);
+           padding: 2px 6px;
+           border-radius: 4px;
+         }
+         
+         /* Resumen compacto */
+         .form-section-compact.summary {
+           background: rgba(59, 130, 246, 0.02);
+           border: 1px solid rgba(59, 130, 246, 0.2);
+         }
+         
+         .concepto-summary-compact {
+           display: flex;
+           flex-direction: column;
+           gap: 12px;
+         }
+         
+         .summary-row {
+           display: flex;
+           flex-direction: column;
+           gap: 4px;
+         }
+         
+         .summary-row strong {
+           font-size: 13px;
+           color: #1e293b;
+         }
+         
+         .summary-row span {
+           font-size: 14px;
+           color: #64748b;
+         }
+         
+         .selected-items {
+           display: flex;
+           flex-wrap: wrap;
+           gap: 6px;
+           margin-top: 4px;
+         }
+         
+         .item-tag {
+           padding: 4px 8px;
+           background: rgba(59, 130, 246, 0.1);
+           color: #3b82f6;
+           border-radius: 12px;
+           font-size: 12px;
+           font-weight: 500;
+         }
+         
+         .brief-preview-compact {
+           font-size: 13px;
+           color: #64748b;
+           line-height: 1.4;
+           margin: 4px 0 0 0;
+           font-style: italic;
+         }
+         
+         /* Responsive para layout compacto */
+         @media (max-width: 768px) {
+           .two-column-layout {
+             grid-template-columns: 1fr;
+             gap: 16px;
+           }
+           
+           .concepto-form-compact {
+             gap: 16px;
+           }
+           
+           .form-section-compact {
+             padding: 12px;
+           }
+         }
+         
+         /* Estilos originales para compatibilidad */
          .concepto-form {
            display: flex;
            flex-direction: column;
@@ -1677,12 +1981,6 @@ const Dashboard: React.FC = () => {
          .section-title i {
            color: #3b82f6;
            font-size: 16px;
-         }
-         
-         .optional {
-           font-size: 12px;
-           color: #64748b;
-           font-weight: 400;
          }
          
          .organization-selector {
@@ -1982,13 +2280,999 @@ const Dashboard: React.FC = () => {
              flex-direction: column;
            }
          }
+
+         /* Marketing Dashboard Styles */
+         .marketing-dashboard {
+           display: flex;
+           flex-direction: column;
+           gap: 24px;
+           animation: fadeIn 0.5s ease-out;
+         }
+
+         .dashboard-header {
+           display: flex;
+           justify-content: space-between;
+           align-items: flex-start;
+           padding: 24px;
+           background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+           border-radius: 16px;
+           border: 1px solid rgba(59, 130, 246, 0.1);
+         }
+
+         .header-content {
+           flex: 1;
+         }
+
+         .dashboard-title {
+           font-size: 28px;
+           font-weight: 800;
+           color: #1e293b;
+           display: flex;
+           align-items: center;
+           gap: 12px;
+           margin: 0 0 8px 0;
+           background: linear-gradient(135deg, #1e293b, #3b82f6);
+           -webkit-background-clip: text;
+           -webkit-text-fill-color: transparent;
+           background-clip: text;
+         }
+
+         .dashboard-subtitle {
+           font-size: 16px;
+           color: #64748b;
+           margin: 0;
+           font-weight: 500;
+         }
+
+         .dashboard-actions {
+           display: flex;
+           gap: 12px;
+         }
+
+         .action-btn {
+           display: flex;
+           align-items: center;
+           gap: 8px;
+           padding: 12px 20px;
+           border: none;
+           border-radius: 12px;
+           font-weight: 600;
+           cursor: pointer;
+           transition: all 0.3s ease;
+           font-size: 14px;
+         }
+
+         .action-btn.primary {
+           background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+           color: white;
+           box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+         }
+
+         .action-btn.primary:hover {
+           transform: translateY(-2px);
+           box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+         }
+
+         .metrics-grid {
+           display: grid;
+           grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+           gap: 20px;
+         }
+
+         .metric-card {
+           background: white;
+           border-radius: 16px;
+           padding: 24px;
+           box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+           border: 1px solid #f1f5f9;
+           transition: all 0.3s ease;
+           position: relative;
+           overflow: hidden;
+         }
+
+         .metric-card::before {
+           content: '';
+           position: absolute;
+           top: 0;
+           left: 0;
+           right: 0;
+           height: 4px;
+           background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+         }
+
+         .metric-card.organizations::before {
+           background: linear-gradient(135deg, #10b981, #059669);
+         }
+
+         .metric-card.products::before {
+           background: linear-gradient(135deg, #f59e0b, #d97706);
+         }
+
+         .metric-card.concepts::before {
+           background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+         }
+
+         .metric-card.roi::before {
+           background: linear-gradient(135deg, #ef4444, #dc2626);
+         }
+
+         .metric-card:hover {
+           transform: translateY(-4px);
+           box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+         }
+
+         .metric-header {
+           display: flex;
+           align-items: center;
+           gap: 8px;
+           margin-bottom: 16px;
+         }
+
+         .metric-title {
+           font-size: 14px;
+           font-weight: 600;
+           color: #64748b;
+         }
+
+         .metric-content {
+           margin-bottom: 12px;
+         }
+
+         .metric-number {
+           font-size: 32px;
+           font-weight: 800;
+           color: #1e293b;
+           display: block;
+           line-height: 1;
+         }
+
+         .metric-label {
+           font-size: 14px;
+           color: #64748b;
+           font-weight: 500;
+         }
+
+         .metric-trend {
+           font-size: 12px;
+           font-weight: 600;
+           padding: 4px 8px;
+           border-radius: 12px;
+           display: inline-block;
+         }
+
+         .metric-trend.positive {
+           background: rgba(16, 185, 129, 0.1);
+           color: #10b981;
+         }
+
+         .metric-trend.negative {
+           background: rgba(239, 68, 68, 0.1);
+           color: #ef4444;
+         }
+
+         .dashboard-summary {
+           display: grid;
+           grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+           gap: 24px;
+         }
+
+         .summary-card {
+           background: white;
+           border-radius: 16px;
+           padding: 24px;
+           box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+           border: 1px solid #f1f5f9;
+         }
+
+         .summary-title {
+           font-size: 18px;
+           font-weight: 700;
+           color: #1e293b;
+           display: flex;
+           align-items: center;
+           gap: 8px;
+           margin: 0 0 20px 0;
+         }
+
+         .summary-list {
+           display: flex;
+           flex-direction: column;
+           gap: 16px;
+         }
+
+         .summary-item {
+           display: flex;
+           align-items: center;
+           gap: 12px;
+           padding: 12px;
+           background: #f8fafc;
+           border-radius: 12px;
+           transition: all 0.2s ease;
+         }
+
+         .summary-item:hover {
+           background: #f1f5f9;
+         }
+
+         .item-avatar {
+           width: 40px;
+           height: 40px;
+           border-radius: 10px;
+           background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+           display: flex;
+           align-items: center;
+           justify-content: center;
+           color: white;
+           flex-shrink: 0;
+         }
+
+         .item-avatar.product {
+           background: linear-gradient(135deg, #f59e0b, #d97706);
+         }
+
+         .item-info {
+           flex: 1;
+           display: flex;
+           flex-direction: column;
+           gap: 2px;
+         }
+
+         .item-name {
+           font-size: 14px;
+           font-weight: 600;
+           color: #1e293b;
+         }
+
+         .item-meta {
+           font-size: 12px;
+           color: #64748b;
+         }
+
+         .item-status {
+           padding: 4px 8px;
+           border-radius: 12px;
+           font-size: 11px;
+           font-weight: 600;
+         }
+
+         .item-status.active {
+           background: rgba(16, 185, 129, 0.1);
+           color: #10b981;
+         }
+
+         .item-price {
+           font-size: 14px;
+           font-weight: 700;
+           color: #1e293b;
+         }
+
+         .marketing-widgets {
+           display: flex;
+           flex-direction: column;
+           gap: 24px;
+         }
+
+         .widget-row {
+           display: grid;
+           grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+           gap: 24px;
+         }
+
+         .widget {
+           background: white;
+           border-radius: 16px;
+           box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+           border: 1px solid #f1f5f9;
+           overflow: hidden;
+         }
+
+         .widget.full-width {
+           grid-column: 1 / -1;
+         }
+
+         .widget-header {
+           padding: 20px 24px 16px;
+           border-bottom: 1px solid #f1f5f9;
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+         }
+
+         .widget-title {
+           font-size: 16px;
+           font-weight: 700;
+           color: #1e293b;
+           display: flex;
+           align-items: center;
+           gap: 8px;
+           margin: 0;
+         }
+
+         .widget-actions {
+           display: flex;
+           gap: 8px;
+         }
+
+         .widget-btn {
+           display: flex;
+           align-items: center;
+           gap: 6px;
+           padding: 6px 12px;
+           border: 1px solid #e2e8f0;
+           background: white;
+           color: #64748b;
+           border-radius: 8px;
+           font-size: 12px;
+           font-weight: 500;
+           cursor: pointer;
+           transition: all 0.2s ease;
+         }
+
+         .widget-btn:hover {
+           background: #3b82f6;
+           color: white;
+           border-color: #3b82f6;
+         }
+
+         .widget-content {
+           padding: 20px 24px;
+         }
+
+         .campaign-list {
+           display: flex;
+           flex-direction: column;
+           gap: 12px;
+         }
+
+         .campaign-item {
+           display: flex;
+           align-items: center;
+           gap: 12px;
+           padding: 12px;
+           background: #f8fafc;
+           border-radius: 12px;
+           transition: all 0.2s ease;
+         }
+
+         .campaign-item:hover {
+           background: #f1f5f9;
+         }
+
+         .campaign-status {
+           width: 8px;
+           height: 8px;
+           border-radius: 50%;
+           flex-shrink: 0;
+         }
+
+         .campaign-status.active {
+           background: #10b981;
+         }
+
+         .campaign-status.paused {
+           background: #f59e0b;
+         }
+
+         .campaign-status.draft {
+           background: #64748b;
+         }
+
+         .campaign-info {
+           flex: 1;
+           display: flex;
+           flex-direction: column;
+           gap: 2px;
+         }
+
+         .campaign-name {
+           font-size: 14px;
+           font-weight: 600;
+           color: #1e293b;
+         }
+
+         .campaign-meta {
+           font-size: 12px;
+           color: #64748b;
+         }
+
+         .campaign-metrics {
+           text-align: right;
+         }
+
+         .time-selector {
+           display: flex;
+           gap: 8px;
+         }
+
+         .time-select {
+           padding: 6px 12px;
+           border: 1px solid #e2e8f0;
+           background: white;
+           color: #64748b;
+           border-radius: 8px;
+           font-size: 12px;
+           cursor: pointer;
+         }
+
+         .performance-chart {
+           display: flex;
+           flex-direction: column;
+           gap: 16px;
+         }
+
+         .chart-bars {
+           display: flex;
+           align-items: end;
+           gap: 12px;
+           height: 120px;
+           padding: 0 8px;
+         }
+
+         .chart-bar {
+           flex: 1;
+           background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+           border-radius: 4px 4px 0 0;
+           position: relative;
+           cursor: pointer;
+           transition: all 0.3s ease;
+           display: flex;
+           align-items: end;
+           justify-content: center;
+           padding-bottom: 8px;
+         }
+
+         .chart-bar.active {
+           background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+         }
+
+         .chart-bar:hover {
+           background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+         }
+
+         .bar-label {
+           font-size: 11px;
+           font-weight: 600;
+           color: white;
+         }
+
+         .chart-legend {
+           display: flex;
+           gap: 16px;
+           justify-content: center;
+         }
+
+         .legend-item {
+           display: flex;
+           align-items: center;
+           gap: 6px;
+           font-size: 12px;
+           color: #64748b;
+         }
+
+         .legend-color {
+           width: 12px;
+           height: 12px;
+           border-radius: 2px;
+         }
+
+         .legend-color.primary {
+           background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+         }
+
+         .analytics-tabs {
+           display: flex;
+           gap: 4px;
+         }
+
+         .tab-btn {
+           padding: 6px 12px;
+           border: none;
+           background: transparent;
+           color: #64748b;
+           border-radius: 8px;
+           font-size: 12px;
+           font-weight: 500;
+           cursor: pointer;
+           transition: all 0.2s ease;
+         }
+
+         .tab-btn.active,
+         .tab-btn:hover {
+           background: #3b82f6;
+           color: white;
+         }
+
+         .analytics-grid {
+           display: grid;
+           grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+           gap: 20px;
+         }
+
+         .analytics-metric {
+           display: flex;
+           align-items: center;
+           gap: 12px;
+           padding: 16px;
+           background: #f8fafc;
+           border-radius: 12px;
+         }
+
+         .metric-icon {
+           width: 40px;
+           height: 40px;
+           border-radius: 10px;
+           background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+           display: flex;
+           align-items: center;
+           justify-content: center;
+           color: white;
+           flex-shrink: 0;
+         }
+
+         .metric-data {
+           display: flex;
+           flex-direction: column;
+           gap: 2px;
+         }
+
+         .metric-change {
+           font-size: 11px;
+           font-weight: 600;
+           padding: 2px 6px;
+           border-radius: 8px;
+           display: inline-block;
+           width: fit-content;
+         }
+
+         .metric-change.positive {
+           background: rgba(16, 185, 129, 0.1);
+           color: #10b981;
+         }
+
+         .metric-change.negative {
+           background: rgba(239, 68, 68, 0.1);
+           color: #ef4444;
+         }
+
+         @media (max-width: 768px) {
+           .dashboard-header {
+             flex-direction: column;
+             gap: 16px;
+             align-items: stretch;
+           }
+
+           .metrics-grid {
+             grid-template-columns: 1fr;
+           }
+
+           .dashboard-summary {
+             grid-template-columns: 1fr;
+           }
+
+           .widget-row {
+             grid-template-columns: 1fr;
+           }
+
+           .analytics-grid {
+             grid-template-columns: 1fr;
+           }
+         }
+
+         /* Modern Dashboard Styles */
+         .minimalist-dashboard {
+           padding: 30px;
+           max-width: 1400px;
+           margin: 0 auto;
+           height: calc(100vh - 80px);
+           overflow: hidden;
+           background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+           font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+         }
+
+         .minimalist-header {
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+           margin-bottom: 40px;
+           position: relative;
+         }
+
+         .minimalist-header::after {
+           content: '';
+           position: absolute;
+           bottom: -15px;
+           left: 0;
+           right: 0;
+           height: 2px;
+           background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+           border-radius: 1px;
+         }
+
+         .minimalist-title {
+           font-size: 32px;
+           font-weight: 800;
+           background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+           -webkit-background-clip: text;
+           -webkit-text-fill-color: transparent;
+           background-clip: text;
+           text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+         }
+
+         .minimalist-metrics {
+           display: grid;
+           grid-template-columns: repeat(4, 1fr);
+           gap: 25px;
+           margin-bottom: 40px;
+         }
+
+         .minimalist-metric {
+           background: linear-gradient(145deg, #ffffff, #f8fafc);
+           padding: 30px 25px;
+           border-radius: 20px;
+           box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+           text-align: center;
+           transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+           border: 1px solid rgba(255, 255, 255, 0.8);
+           position: relative;
+           overflow: hidden;
+         }
+
+         .minimalist-metric::before {
+           content: '';
+           position: absolute;
+           top: 0;
+           left: -100%;
+           width: 100%;
+           height: 100%;
+           background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+           transition: left 0.6s;
+         }
+
+         .minimalist-metric:hover::before {
+           left: 100%;
+         }
+
+         .minimalist-metric:hover {
+           transform: translateY(-8px) scale(1.02);
+           box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), 0 8px 16px rgba(102, 126, 234, 0.2);
+           border-color: rgba(102, 126, 234, 0.3);
+         }
+
+         .minimalist-metric-icon {
+           width: 48px;
+           height: 48px;
+           margin: 0 auto 16px;
+           color: #667eea;
+           filter: drop-shadow(0 2px 4px rgba(102, 126, 234, 0.2));
+         }
+
+         .minimalist-metric-value {
+           font-size: 32px;
+           font-weight: 800;
+           background: linear-gradient(135deg, #1a1a1a 0%, #4a5568 100%);
+           -webkit-background-clip: text;
+           -webkit-text-fill-color: transparent;
+           background-clip: text;
+           margin-bottom: 8px;
+           text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+         }
+
+         .minimalist-metric-label {
+           font-size: 15px;
+           color: #64748b;
+           font-weight: 600;
+           letter-spacing: 0.5px;
+           text-transform: uppercase;
+         }
+
+         .dashboard-grid {
+           display: grid;
+           grid-template-columns: 1fr 1fr;
+           gap: 30px;
+         }
+
+         .minimalist-chart,
+         .simple-chart {
+           background: linear-gradient(145deg, #ffffff, #f8fafc);
+           padding: 35px;
+           border-radius: 24px;
+           box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
+           height: 320px;
+           border: 1px solid rgba(255, 255, 255, 0.8);
+           transition: all 0.3s ease;
+           position: relative;
+           overflow: hidden;
+         }
+
+         .minimalist-chart::before,
+         .simple-chart::before,
+         .recent-organizations::before {
+           content: '';
+           position: absolute;
+           top: 0;
+           left: 0;
+           right: 0;
+           height: 4px;
+           background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+           border-radius: 24px 24px 0 0;
+         }
+
+         .minimalist-chart:hover,
+         .simple-chart:hover,
+         .recent-organizations:hover {
+           transform: translateY(-4px);
+           box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12), 0 8px 20px rgba(102, 126, 234, 0.15);
+         }
+
+         .recent-organizations {
+           background: linear-gradient(145deg, #ffffff, #f8fafc);
+           padding: 35px;
+           border-radius: 24px;
+           box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
+           height: 320px;
+           border: 1px solid rgba(255, 255, 255, 0.8);
+           transition: all 0.3s ease;
+           position: relative;
+           overflow: hidden;
+         }
+
+         .org-list {
+           display: flex;
+           flex-direction: column;
+           gap: 16px;
+           height: 200px;
+           overflow-y: auto;
+           padding-right: 8px;
+         }
+
+         .org-list::-webkit-scrollbar {
+           width: 6px;
+         }
+
+         .org-list::-webkit-scrollbar-track {
+           background: #f1f5f9;
+           border-radius: 3px;
+         }
+
+         .org-list::-webkit-scrollbar-thumb {
+           background: linear-gradient(135deg, #667eea, #764ba2);
+           border-radius: 3px;
+         }
+
+         .org-item {
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+           padding: 16px;
+           background: linear-gradient(145deg, #ffffff, #f8fafc);
+           border: 1px solid rgba(102, 126, 234, 0.1);
+           border-radius: 16px;
+           transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+           position: relative;
+           overflow: hidden;
+         }
+
+         .org-item::before {
+           content: '';
+           position: absolute;
+           top: 0;
+           left: -100%;
+           width: 100%;
+           height: 100%;
+           background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.05), transparent);
+           transition: left 0.5s;
+         }
+
+         .org-item:hover::before {
+           left: 100%;
+         }
+
+         .org-item:hover {
+           transform: translateX(4px);
+           background: linear-gradient(145deg, #ffffff, #f1f5f9);
+           border-color: rgba(102, 126, 234, 0.2);
+           box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08), 0 3px 10px rgba(102, 126, 234, 0.1);
+         }
+
+         .org-info {
+           display: flex;
+           align-items: center;
+           gap: 16px;
+         }
+
+         .org-details {
+           display: flex;
+           flex-direction: column;
+           gap: 4px;
+         }
+
+         .org-name {
+           font-weight: 700;
+           color: #1e293b;
+           font-size: 15px;
+           letter-spacing: -0.025em;
+         }
+
+         .org-code {
+           font-size: 13px;
+           color: #64748b;
+           font-weight: 500;
+           opacity: 0.8;
+         }
+
+         .org-actions {
+           display: flex;
+           gap: 10px;
+         }
+
+         .action-btn {
+           padding: 10px;
+           border: none;
+           border-radius: 12px;
+           cursor: pointer;
+           transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+           display: flex;
+           align-items: center;
+           justify-content: center;
+           position: relative;
+           overflow: hidden;
+         }
+
+         .action-btn::before {
+           content: '';
+           position: absolute;
+           top: 50%;
+           left: 50%;
+           width: 0;
+           height: 0;
+           background: rgba(255, 255, 255, 0.3);
+           border-radius: 50%;
+           transform: translate(-50%, -50%);
+           transition: width 0.3s, height 0.3s;
+         }
+
+         .action-btn:hover::before {
+           width: 100px;
+           height: 100px;
+         }
+
+         .action-btn.edit {
+           background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+           color: white;
+           box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+         }
+
+         .action-btn.edit:hover {
+           transform: translateY(-2px) scale(1.05);
+           box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+         }
+
+         .action-btn.delete {
+           background: linear-gradient(135deg, #ef4444, #dc2626);
+           color: white;
+           box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+         }
+
+         .action-btn.delete:hover {
+           transform: translateY(-2px) scale(1.05);
+           box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+         }
+
+         .no-organizations {
+           display: flex;
+           flex-direction: column;
+           align-items: center;
+           justify-content: center;
+           height: 100%;
+           color: #64748b;
+           gap: 12px;
+           font-weight: 500;
+         }
+
+         .chart-title {
+           font-size: 20px;
+           font-weight: 700;
+           background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
+           -webkit-background-clip: text;
+           -webkit-text-fill-color: transparent;
+           background-clip: text;
+           margin-bottom: 25px;
+           text-align: center;
+           letter-spacing: -0.025em;
+         }
+
+         .bar-chart {
+           display: flex;
+           align-items: end;
+           justify-content: space-between;
+           height: 200px;
+           gap: 16px;
+           padding: 0 10px;
+         }
+
+         .bar {
+           flex: 1;
+           background: linear-gradient(to top, #667eea 0%, #764ba2 50%, #f093fb 100%);
+           border-radius: 8px 8px 0 0;
+           position: relative;
+           transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+           min-height: 30px;
+           box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+         }
+
+         .bar::before {
+           content: '';
+           position: absolute;
+           top: 0;
+           left: 0;
+           right: 0;
+           bottom: 0;
+           background: linear-gradient(to top, rgba(255,255,255,0.1), rgba(255,255,255,0.3));
+           border-radius: 8px 8px 0 0;
+           opacity: 0;
+           transition: opacity 0.3s ease;
+         }
+
+         .bar:hover {
+           transform: translateY(-4px) scale(1.02);
+           box-shadow: 0 12px 25px rgba(102, 126, 234, 0.3), 0 4px 12px rgba(118, 75, 162, 0.2);
+         }
+
+         .bar:hover::before {
+           opacity: 1;
+         }
+
+         .bar-label {
+           position: absolute;
+           bottom: -25px;
+           left: 50%;
+           transform: translateX(-50%);
+           font-size: 12px;
+           color: #6b7280;
+           font-weight: 500;
+         }
+
+         .bar-value {
+           position: absolute;
+           top: -25px;
+           left: 50%;
+           transform: translateX(-50%);
+           font-size: 12px;
+           color: #1a1a1a;
+           font-weight: 600;
+         }
+
+         @media (max-width: 768px) {
+           .minimalist-metrics {
+             grid-template-columns: repeat(2, 1fr);
+           }
+
+           .minimalist-dashboard {
+             padding: 15px;
+           }
+
+           .dashboard-grid {
+             grid-template-columns: 1fr;
+           }
+
+           .minimalist-chart,
+           .simple-chart,
+           .recent-organizations {
+             padding: 20px;
+             height: 250px;
+           }
+
+           .org-list {
+             height: 150px;
+           }
+         }
        `}</style>
       
       <div className="dashboard">
         <nav className="navbar">
           <div className="nav-container">
             <div className="nav-logo">
-              <i className="fas fa-rocket"></i>
+              <LogoIcon size={32} />
               <div className="logo-text">
                 <span className="logo-main">IMC</span>
                 <span className="logo-sub">INGENES MARKETING CAMPAIGN</span>
@@ -2002,7 +3286,7 @@ const Dashboard: React.FC = () => {
                 className={`nav-link ${activeSection === 'dashboard' ? 'active' : ''}`}
                 onClick={() => handleNavClick('dashboard')}
               >
-                <i className="fas fa-chart-line"></i>
+                <DashboardIcon size={16} />
                 <span>Dashboard</span>
               </a>
               <a 
@@ -2014,7 +3298,7 @@ const Dashboard: React.FC = () => {
                   handleNavClick('organizaciones');
                 }}
               >
-                <i className="fas fa-building"></i>
+                <OrganizationIcon size={16} />
                 <span>Organizaciones</span>
               </a>
               <a 
@@ -2023,7 +3307,7 @@ const Dashboard: React.FC = () => {
                 className={`nav-link ${activeSection === 'concepto-creativo' ? 'active' : ''}`}
                 onClick={() => handleNavClick('concepto-creativo')}
               >
-                <i className="fas fa-lightbulb"></i>
+                <CreativeIcon size={16} />
                 <span>Concepto Creativo</span>
               </a>
               <a 
@@ -2032,7 +3316,7 @@ const Dashboard: React.FC = () => {
                 className={`nav-link ${activeSection === 'patients' ? 'active' : ''}`}
                 onClick={() => handleNavClick('patients')}
               >
-                <i className="fas fa-users"></i>
+                <PatientsIcon size={16} />
                 <span>Pacientes</span>
               </a>
             </div>
@@ -2051,13 +3335,13 @@ const Dashboard: React.FC = () => {
                     <span className="user-name">Edgar Barragán</span>
                     <span className="user-role">Administrador</span>
                   </div>
-                  <i className={`fas fa-chevron-down dropdown-arrow ${isUserMenuOpen ? 'open' : ''}`}></i>
+                  <ChevronDownIcon size={12} className={`dropdown-arrow ${isUserMenuOpen ? 'open' : ''}`} />
                 </div>
                 
                 {isUserMenuOpen && (
                   <div className="user-dropdown">
                     <button className="logout-btn" onClick={handleLogout}>
-                      <i className="fas fa-sign-out-alt"></i>
+                      <LogoutIcon size={16} />
                       Cerrar Sesión
                     </button>
                   </div>
@@ -2078,165 +3362,101 @@ const Dashboard: React.FC = () => {
           <div className="content-container">
             {activeSection === 'dashboard' && (
               <>
-                <div className="modern-dashboard">
-                  {/* Statistics Panel */}
-                  <div className="stats-panel">
-                    <div className="stats-header">
-                      <h2>Statistics</h2>
+                <div className="minimal-dashboard">
+                  {/* Métricas Compactas */}
+                  <div className="compact-metrics">
+                    <div className="metric-item">
+                      <OrganizationIcon size={16} />
+                      <span className="metric-value">{organizations.length}</span>
+                      <span className="metric-label">Organizaciones</span>
                     </div>
-                    
-                    <div className="circular-progress">
-                      <div className="progress-ring">
-                        <svg width="120" height="120">
-                          <circle cx="60" cy="60" r="50" className="progress-bg"/>
-                          <circle cx="60" cy="60" r="50" className="progress-fill" strokeDasharray="314" strokeDashoffset="94"/>
-                        </svg>
-                        <div className="progress-text">
-                          <span className="progress-value">70%</span>
-                          <span className="progress-label">Total earning</span>
-                          <span className="progress-amount">$12,875</span>
-                        </div>
-                      </div>
+                    <div className="metric-item">
+                      <ProductIcon size={16} />
+                      <span className="metric-value">{products.length}</span>
+                      <span className="metric-label">Productos</span>
                     </div>
-
-                    <div className="stats-metrics">
-                      <div className="metric-item">
-                        <span className="metric-label">Pageviews</span>
-                        <span className="metric-value">405</span>
-                        <div className="metric-chart">
-                          <div className="mini-bars">
-                            <div className="mini-bar" style={{height: '60%'}}></div>
-                            <div className="mini-bar" style={{height: '80%'}}></div>
-                            <div className="mini-bar" style={{height: '40%'}}></div>
-                            <div className="mini-bar" style={{height: '90%'}}></div>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="metric-item">
-                        <span className="metric-label">Visitors</span>
-                        <span className="metric-value">1,024</span>
-                        <div className="metric-chart">
-                          <div className="mini-bars">
-                            <div className="mini-bar" style={{height: '70%'}}></div>
-                            <div className="mini-bar" style={{height: '50%'}}></div>
-                            <div className="mini-bar" style={{height: '85%'}}></div>
-                            <div className="mini-bar" style={{height: '65%'}}></div>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="metric-item">
-                        <span className="metric-label">Bounce</span>
-                        <span className="metric-value">3.4%</span>
-                        <div className="metric-chart">
-                          <div className="mini-bars">
-                            <div className="mini-bar" style={{height: '30%'}}></div>
-                            <div className="mini-bar" style={{height: '45%'}}></div>
-                            <div className="mini-bar" style={{height: '25%'}}></div>
-                            <div className="mini-bar" style={{height: '35%'}}></div>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="metric-item">
-                        <span className="metric-label">Revenue</span>
-                        <span className="metric-value">$43</span>
-                        <div className="metric-chart">
-                          <div className="mini-bars">
-                            <div className="mini-bar" style={{height: '55%'}}></div>
-                            <div className="mini-bar" style={{height: '75%'}}></div>
-                            <div className="mini-bar" style={{height: '45%'}}></div>
-                            <div className="mini-bar" style={{height: '80%'}}></div>
-                          </div>
-                        </div>
-                      </div>
+                    <div className="metric-item">
+                      <CreativeIcon size={16} />
+                      <span className="metric-value">12</span>
+                      <span className="metric-label">Conceptos</span>
                     </div>
-
-                    <div className="earnings-summary">
-                      <div className="earning-item">
-                        <span className="earning-label">Total earning</span>
-                        <span className="earning-value">$12,875</span>
-                        <span className="earning-change">+12%</span>
-                      </div>
-                      
-                      <div className="earning-item">
-                        <span className="earning-label">Spending</span>
-                        <span className="earning-value">$43,123</span>
-                        <span className="earning-change">+8%</span>
-                      </div>
+                    <div className="metric-item">
+                      <ChartIcon size={16} />
+                      <span className="metric-value">285%</span>
+                      <span className="metric-label">ROI</span>
                     </div>
                   </div>
 
-                  {/* Main Visualization Area */}
-                  <div className="visualization-area">
-                    <div className="viz-header">
-                      <h1>Data visualization</h1>
-                      <div className="time-controls">
-                        <button className="time-btn">1H</button>
-                        <button className="time-btn">1W</button>
-                        <button className="time-btn active">1M</button>
-                        <button className="time-btn">1Y</button>
-                        <button className="time-btn">ALL</button>
+                  {/* Layout de dos columnas */}
+                  <div className="dashboard-grid">
+                    {/* Gráfica de Barras Simple */}
+                    <div className="simple-chart">
+                      <h3 className="chart-title">Rendimiento Mensual</h3>
+                      <div className="bar-chart">
+                        <div className="bar" style={{height: '60%'}}>
+                          <span className="bar-value">85%</span>
+                          <span className="bar-label">Ene</span>
+                        </div>
+                        <div className="bar" style={{height: '75%'}}>
+                          <span className="bar-value">92%</span>
+                          <span className="bar-label">Feb</span>
+                        </div>
+                        <div className="bar" style={{height: '90%'}}>
+                          <span className="bar-value">98%</span>
+                          <span className="bar-label">Mar</span>
+                        </div>
+                        <div className="bar active" style={{height: '85%'}}>
+                          <span className="bar-value">95%</span>
+                          <span className="bar-label">Abr</span>
+                        </div>
+                        <div className="bar" style={{height: '70%'}}>
+                          <span className="bar-value">88%</span>
+                          <span className="bar-label">May</span>
+                        </div>
+                        <div className="bar" style={{height: '80%'}}>
+                          <span className="bar-value">93%</span>
+                          <span className="bar-label">Jun</span>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="bubble-chart">
-                      <div className="bubble large" style={{left: '45%', top: '40%'}} data-value="Investment: $1.2M">
-                        <span className="bubble-label">Investment</span>
-                        <span className="bubble-value">$1.2M</span>
-                      </div>
-                      
-                      <div className="bubble medium" style={{left: '25%', top: '25%'}} data-value="Revenue: $875K">
-                        <span className="bubble-label">Revenue</span>
-                        <span className="bubble-value">$875K</span>
-                      </div>
-                      
-                      <div className="bubble small" style={{left: '70%', top: '30%'}} data-value="Profit: $432K">
-                        <span className="bubble-label">Profit</span>
-                        <span className="bubble-value">$432K</span>
-                      </div>
-                      
-                      <div className="bubble medium" style={{left: '60%', top: '65%'}} data-value="Expenses: $654K">
-                        <span className="bubble-label">Expenses</span>
-                        <span className="bubble-value">$654K</span>
-                      </div>
-                      
-                      <div className="bubble small" style={{left: '30%', top: '70%'}} data-value="Marketing: $234K">
-                        <span className="bubble-label">Marketing</span>
-                        <span className="bubble-value">$234K</span>
-                      </div>
-                      
-                      <div className="bubble tiny" style={{left: '15%', top: '50%'}} data-value="R&D: $156K">
-                        <span className="bubble-label">R&D</span>
-                        <span className="bubble-value">$156K</span>
-                      </div>
-                      
-                      <div className="bubble tiny" style={{left: '80%', top: '55%'}} data-value="Sales: $298K">
-                        <span className="bubble-label">Sales</span>
-                        <span className="bubble-value">$298K</span>
-                      </div>
-                      
-                      <div className="bubble small" style={{left: '55%', top: '15%'}} data-value="Operations: $387K">
-                        <span className="bubble-label">Operations</span>
-                        <span className="bubble-value">$387K</span>
-                      </div>
-                    </div>
-
-                    <div className="bottom-metrics">
-                      <div className="bottom-metric">
-                        <span className="metric-number">204</span>
-                        <span className="metric-desc">TRANSACTIONS</span>
-                      </div>
-                      
-                      <div className="bottom-metric">
-                        <span className="metric-number">65,540</span>
-                        <span className="metric-desc">UNIQUE USERS</span>
-                      </div>
-                      
-                      <div className="bottom-metric">
-                        <span className="metric-number">324</span>
-                        <span className="metric-desc">TOTAL SESSIONS</span>
+                    {/* Organizaciones Recientes */}
+                    <div className="recent-organizations">
+                      <h3 className="chart-title">Organizaciones Recientes</h3>
+                      <div className="org-list">
+                        {organizations.slice(0, 4).map((org, index) => (
+                          <div key={org.id} className="org-item">
+                            <div className="org-info">
+                              <OrganizationIcon size={20} />
+                              <div className="org-details">
+                                <span className="org-name">{org.name}</span>
+                                <span className="org-code">ORG-{String(index + 1).padStart(3, '0')}</span>
+                              </div>
+                            </div>
+                            <div className="org-actions">
+                              <button 
+                                className="action-btn edit"
+                                onClick={() => handleEditOrganization(org)}
+                                title="Editar organización"
+                              >
+                                <EditIcon size={16} />
+                              </button>
+                              <button 
+                                className="action-btn delete"
+                                onClick={() => handleDeleteOrganization(org.id)}
+                                title="Eliminar organización"
+                              >
+                                <DeleteIcon size={16} />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                        {organizations.length === 0 && (
+                          <div className="no-organizations">
+                            <OrganizationIcon size={24} />
+                            <span>No hay organizaciones</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -2247,7 +3467,7 @@ const Dashboard: React.FC = () => {
                 <div className="organizations-page">
                   <div className="page-header">
                     <h1 className="page-title">
-                      <i className="fas fa-building"></i>
+                      <OrganizationIcon />
                       Organizaciones
                     </h1>
                     <button 
@@ -2258,7 +3478,7 @@ const Dashboard: React.FC = () => {
                         setIsModalOpen(true);
                       }}
                     >
-                      <i className="fas fa-plus"></i>
+                      <AddIcon />
                       Nueva Organización
                     </button>
                   </div>
@@ -2266,7 +3486,7 @@ const Dashboard: React.FC = () => {
                   <div className="page-content">
                     <div className="search-filters">
                       <div className="search-box">
-                        <i className="fas fa-search"></i>
+                        <SearchIcon />
                         <input type="text" placeholder="Buscar organizaciones..." />
                       </div>
                       <div className="filter-buttons">
@@ -2308,7 +3528,7 @@ const Dashboard: React.FC = () => {
                               <div className="table-cell">
                                 <div className="org-info">
                                   <div className="org-avatar">
-                                    <i className="fas fa-building"></i>
+                                    <OrganizationIcon />
                                   </div>
                                   <div className="org-details">
                                     <span className="org-name">{org.name}</span>
@@ -2331,14 +3551,14 @@ const Dashboard: React.FC = () => {
                                     onClick={() => handleEditOrganization(org)}
                                     title="Editar organización"
                                   >
-                                    <i className="fas fa-edit"></i>
+                                    <EditIcon />
                                   </button>
                                   <button 
                                     className="action-btn delete"
                                     onClick={() => handleDeleteOrganization(org.id)}
                                     title="Eliminar organización"
                                   >
-                                    <i className="fas fa-trash"></i>
+                                    <DeleteIcon />
                                   </button>
                                 </div>
                               </div>
@@ -2355,7 +3575,7 @@ const Dashboard: React.FC = () => {
                 <div className="concepto-creativo-page">
                   <div className="page-header compact">
                     <h1 className="page-title">
-                      <i className="fas fa-lightbulb"></i>
+                      <CreativeIcon />
                       Concepto Creativo
                     </h1>
                     <p className="page-description">
@@ -2368,7 +3588,7 @@ const Dashboard: React.FC = () => {
                       {/* Selector de Organización - Compacto */}
                       <div className="form-section-compact">
                         <h3 className="section-title-compact">
-                          <i className="fas fa-building"></i>
+                          <OrganizationIcon />
                           Organización
                         </h3>
                         <select 
@@ -2391,13 +3611,13 @@ const Dashboard: React.FC = () => {
                           {/* Columna izquierda - Productos */}
                           <div className="form-section-compact">
                             <h3 className="section-title-compact">
-                              <i className="fas fa-box"></i>
+                              <ProductIcon />
                               Productos ({products.length})
                             </h3>
                             <div className="products-grid-compact">
                               {products.length === 0 ? (
                                 <div className="no-items-compact">
-                                  <i className="fas fa-info-circle"></i>
+                                  <ProductIcon />
                                   <span>No hay productos disponibles</span>
                                 </div>
                               ) : (
@@ -2432,13 +3652,13 @@ const Dashboard: React.FC = () => {
                           {/* Columna derecha - Buyer Personas */}
                           <div className="form-section-compact">
                             <h3 className="section-title-compact">
-                              <i className="fas fa-users"></i>
+                              <PersonaIcon />
                               Buyer Personas ({conceptoBuyerPersonas.length})
                             </h3>
                             <div className="personas-grid-compact">
                               {conceptoBuyerPersonas.length === 0 ? (
                                 <div className="no-items-compact">
-                                  <i className="fas fa-info-circle"></i>
+                                  <PersonaIcon />
                                   <span>No hay buyer personas disponibles</span>
                                 </div>
                               ) : (
@@ -2448,9 +3668,9 @@ const Dashboard: React.FC = () => {
                                       <span className="item-name">{persona.name}</span>
                                     </div>
                                     <div className="persona-info-compact">
-                                      <span><i className="fas fa-birthday-cake"></i> {persona.age_range}</span>
-                                      <span><i className="fas fa-briefcase"></i> {persona.occupation}</span>
-                                      <span><i className="fas fa-map-marker-alt"></i> {persona.location}</span>
+                                      <span><AgeIcon /> {persona.age_range}</span>
+                                      <span><OccupationIcon /> {persona.occupation}</span>
+                                      <span><LocationIcon /> {persona.location}</span>
                                     </div>
                                   </div>
                                 ))

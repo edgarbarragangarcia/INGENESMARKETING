@@ -1,6 +1,14 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { authService } from '@/lib/supabase';
+import {
+  MagicIcon,
+  CalendarIcon,
+  ChartIcon,
+  UsersIcon,
+  PaletteIcon,
+  ShareIcon
+} from './Icons';
 
 function LandingPage() {
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -1100,7 +1108,7 @@ function LandingPage() {
             <div className="features-grid">
               <div className="feature-card">
                 <div className="feature-icon">
-                  <i className="fas fa-magic"></i>
+                  <MagicIcon />
                 </div>
                 <h3>IA Generativa</h3>
                 <p>Crea contenido único y atractivo con nuestra inteligencia artificial avanzada. Desde textos hasta imágenes, todo automatizado.</p>
@@ -1108,7 +1116,7 @@ function LandingPage() {
               
               <div className="feature-card">
                 <div className="feature-icon">
-                  <i className="fas fa-calendar-alt"></i>
+                  <CalendarIcon />
                 </div>
                 <h3>Programación Inteligente</h3>
                 <p>Programa tus publicaciones en el momento perfecto. Nuestro algoritmo encuentra los mejores horarios para tu audiencia.</p>
@@ -1116,7 +1124,7 @@ function LandingPage() {
               
               <div className="feature-card">
                 <div className="feature-icon">
-                  <i className="fas fa-chart-line"></i>
+                  <ChartIcon />
                 </div>
                 <h3>Analytics Avanzados</h3>
                 <p>Obtén insights profundos sobre el rendimiento de tu contenido. Métricas detalladas y recomendaciones personalizadas.</p>
@@ -1124,7 +1132,7 @@ function LandingPage() {
               
               <div className="feature-card">
                 <div className="feature-icon">
-                  <i className="fas fa-users"></i>
+                  <UsersIcon />
                 </div>
                 <h3>Colaboración en Equipo</h3>
                 <p>Trabaja con tu equipo de manera eficiente. Roles, permisos y flujos de trabajo colaborativos.</p>
@@ -1132,7 +1140,7 @@ function LandingPage() {
               
               <div className="feature-card">
                 <div className="feature-icon">
-                  <i className="fas fa-palette"></i>
+                  <PaletteIcon />
                 </div>
                 <h3>Editor Visual</h3>
                 <p>Diseña contenido profesional sin conocimientos técnicos. Editor drag & drop con plantillas premium.</p>
@@ -1140,7 +1148,7 @@ function LandingPage() {
               
               <div className="feature-card">
                 <div className="feature-icon">
-                  <i className="fas fa-share-alt"></i>
+                  <ShareIcon />
                 </div>
                 <h3>Multi-Plataforma</h3>
                 <p>Publica en todas las redes sociales desde un solo lugar. Instagram, Facebook, Twitter, LinkedIn y más.</p>

@@ -2,8 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { authService, supabase } from '@/lib/supabase';
 import OrganizationModal from './OrganizationModal';
+
 
 interface Organization {
   id: string;
@@ -34,13 +36,8 @@ interface ConceptoCreativo {
   brief: string;
 }
 
-interface OrganizationFormData {
-  name: string;
-  mission: string;
-  vision: string;
-  strategicObjectives: string[];
-  logo: File | null;
-  // Buyer Persona fields
+interface BuyerPersona {
+  id?: string | null;
   personaName: string;
   ageRange: string;
   gender: string;
@@ -55,7 +52,10 @@ interface OrganizationFormData {
   motivations: string;
   frustrations: string;
   personaAvatar: File | null;
-  // Product fields
+}
+
+interface ProductData {
+  id?: string | null;
   productName: string;
   productDescription: string;
   category: string;
@@ -64,7 +64,19 @@ interface OrganizationFormData {
   status: string;
 }
 
+interface OrganizationFormData {
+  name: string;
+  mission: string;
+  vision: string;
+  strategicObjectives: string[];
+  logo: File | null;
+  buyerPersonas: BuyerPersona[];
+  products: ProductData[];
+}
+
 const Dashboard: React.FC = () => {
+  const router = useRouter();
+  
   // Inicializar activeSection basado en el hash de la URL
   const getInitialSection = () => {
     if (typeof window !== 'undefined') {
@@ -80,16 +92,159 @@ const Dashboard: React.FC = () => {
   const [activeSection, setActiveSection] = useState(getInitialSection);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const [isOrganizationModalOpen, setIsOrganizationModalOpen] = useState(false);
+
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingOrganization, setEditingOrganization] = useState<Organization | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
   const [conceptoCreativo, setConceptoCreativo] = useState<ConceptoCreativo>({
     organizacion: '',
     productos: [],
     brief: ''
   });
+  const [organizationPersonas, setOrganizationPersonas] = useState<any[]>([]);
+  const [organizationProducts, setOrganizationProducts] = useState<any[]>([]);
+
+  // Función para manejar el envío del modal
+  const handleModalSubmit = async (formData: any) => {
+    try {
+      const user = await authService.getCurrentUser();
+      
+      if (!user) {
+        console.error('Usuario no autenticado');
+        return;
+      }
+
+      const organizationData = {
+        name: formData.organization.name,
+        mission: formData.organization.mission,
+        vision: formData.organization.vision,
+        strategic_objectives: formData.organization.strategicObjectives.filter((obj: string) => obj.trim() !== ''),
+        ...(isEditMode ? {} : { created_by: user.id })
+      };
+
+      let orgResult;
+      
+      if (isEditMode && editingOrganization) {
+        // Actualizar organización existente
+        const { data: updatedOrg, error: orgError } = await supabase
+          .from('organizations')
+          .update(organizationData)
+          .eq('id', editingOrganization.id)
+          .select()
+          .single();
+        
+        if (orgError) {
+          console.error('Error al actualizar organización:', orgError);
+          return;
+        }
+        
+        orgResult = updatedOrg;
+      } else {
+        // Crear nueva organización
+        const { data: newOrg, error: orgError } = await supabase
+          .from('organizations')
+          .insert([organizationData])
+          .select()
+          .single();
+        
+        if (orgError) {
+          console.error('Error al crear organización:', orgError);
+          return;
+        }
+        
+        orgResult = newOrg;
+      }
+
+
+
+      // Procesar buyer personas
+      if (isEditMode && editingOrganization) {
+        // En modo edición, eliminar personas existentes y crear nuevas
+        await supabase
+          .from('buyer_personas')
+          .delete()
+          .eq('organization_id', editingOrganization.id);
+      }
+      
+      if (formData.buyerPersonas && formData.buyerPersonas.length > 0) {
+        for (const persona of formData.buyerPersonas) {
+          if (persona.personaName) {
+            const personaData = {
+              organization_id: orgResult.id,
+              name: persona.personaName,
+              age_range: persona.ageRange,
+              gender: persona.gender,
+              occupation: persona.occupation,
+              income_level: persona.incomeLevel,
+              education_level: persona.educationLevel,
+              location: persona.location,
+              pain_points: persona.painPoints.filter((p: string) => p.trim() !== ''),
+              goals: persona.goals.filter((g: string) => g.trim() !== ''),
+              preferred_channels: persona.preferredChannels.filter((c: string) => c.trim() !== ''),
+              behavior_patterns: persona.behaviorPatterns,
+              motivations: persona.motivations,
+              frustrations: persona.frustrations
+            };
+
+            const { error: personaError } = await supabase
+              .from('buyer_personas')
+              .insert([personaData]);
+
+            if (personaError) {
+              console.error('Error al crear buyer persona:', personaError);
+            }
+          }
+        }
+      }
+
+      // Procesar productos
+      if (isEditMode && editingOrganization) {
+        // En modo edición, eliminar productos existentes y crear nuevos
+        await supabase
+          .from('products')
+          .delete()
+          .eq('organization_id', editingOrganization.id);
+      }
+      
+      if (formData.products && formData.products.length > 0) {
+        for (const product of formData.products) {
+          if (product.productName) {
+            const productData = {
+              organization_id: orgResult.id,
+              name: product.productName,
+              description: product.productDescription,
+              category: product.category,
+              price: parseFloat(product.price) || 0,
+              currency: product.currency,
+              status: product.status
+            };
+
+            const { error: productError } = await supabase
+              .from('products')
+              .insert([productData]);
+
+            if (productError) {
+              console.error('Error al crear producto:', productError);
+            }
+          }
+        }
+      }
+
+      console.log(isEditMode ? 'Organización actualizada exitosamente:' : 'Organización creada exitosamente:', orgResult);
+      
+      // Limpiar estados de edición
+      setIsEditMode(false);
+      setEditingOrganization(null);
+       // Recargar organizaciones
+       loadOrganizations();
+       setIsModalOpen(false);
+    } catch (error) {
+      console.error('Error al procesar el formulario:', error);
+    }
+  };
 
   const handleNavClick = (section: string) => {
     setActiveSection(section);
@@ -141,9 +296,47 @@ const Dashboard: React.FC = () => {
     loadOrganizations();
   }, []);
 
-  const handleEditOrganization = (organization: Organization) => {
+  const handleEditOrganization = async (organization: Organization) => {
     setEditingOrganization(organization);
-    setIsOrganizationModalOpen(true);
+    setIsEditMode(true);
+    
+    // Cargar buyer personas y productos de la organización
+    await loadOrganizationRelatedData(organization.id);
+    
+    // Abrir el modal en modo de edición
+    setIsModalOpen(true);
+  };
+
+  const loadOrganizationRelatedData = async (organizationId: string) => {
+    try {
+      // Cargar buyer personas
+      const { data: personas, error: personasError } = await supabase
+        .from('buyer_personas')
+        .select('*')
+        .eq('organization_id', organizationId)
+        .order('created_at', { ascending: false });
+
+      if (personasError) {
+        console.error('Error al cargar buyer personas:', personasError);
+      } else {
+        setOrganizationPersonas(personas || []);
+      }
+
+      // Cargar productos
+      const { data: products, error: productsError } = await supabase
+        .from('products')
+        .select('*')
+        .eq('organization_id', organizationId)
+        .order('created_at', { ascending: false });
+
+      if (productsError) {
+        console.error('Error al cargar productos:', productsError);
+      } else {
+        setOrganizationProducts(products || []);
+      }
+    } catch (error) {
+      console.error('Error al cargar datos relacionados:', error);
+    }
   };
 
   const handleDeleteOrganization = async (organizationId: string) => {
@@ -214,59 +407,93 @@ const Dashboard: React.FC = () => {
         organization = newOrg;
       }
 
-      // Crear buyer persona si hay datos
-      if (data.personaName) {
-        const personaData = {
-          organization_id: organization.id,
-          name: data.personaName,
-          age_range: data.ageRange,
-          gender: data.gender,
-          occupation: data.occupation,
-          income_level: data.incomeLevel,
-          education_level: data.educationLevel,
-          location: data.location,
-          pain_points: data.painPoints?.filter((point: string) => point.trim() !== '') || [],
-          goals: data.goals?.filter((goal: string) => goal.trim() !== '') || [],
-          preferred_channels: data.preferredChannels?.filter((channel: string) => channel.trim() !== '') || [],
-          behavior_patterns: data.behaviorPatterns,
-          motivations: data.motivations,
-          frustrations: data.frustrations
-        };
+      // Procesar buyer personas
+      if (data.buyerPersonas && data.buyerPersonas.length > 0) {
+        for (const persona of data.buyerPersonas) {
+          if (persona.personaName) {
+            const personaData = {
+              organization_id: organization.id,
+              name: persona.personaName,
+              age_range: persona.ageRange,
+              gender: persona.gender,
+              occupation: persona.occupation,
+              income_level: persona.incomeLevel,
+              education_level: persona.educationLevel,
+              location: persona.location,
+              pain_points: persona.painPoints?.filter((point: string) => point.trim() !== '') || [],
+              goals: persona.goals?.filter((goal: string) => goal.trim() !== '') || [],
+              preferred_channels: persona.preferredChannels?.filter((channel: string) => channel.trim() !== '') || [],
+              behavior_patterns: persona.behaviorPatterns,
+              motivations: persona.motivations,
+              frustrations: persona.frustrations
+            };
 
-        const { error: personaError } = await supabase
-          .from('buyer_personas')
-          .insert([personaData]);
+            if (persona.id) {
+              // Actualizar buyer persona existente
+              const { error: personaError } = await supabase
+                .from('buyer_personas')
+                .update(personaData)
+                .eq('id', persona.id);
 
-        if (personaError) {
-          console.error('Error al crear buyer persona:', personaError);
+              if (personaError) {
+                console.error('Error al actualizar buyer persona:', personaError);
+              }
+            } else {
+              // Crear nueva buyer persona
+              const { error: personaError } = await supabase
+                .from('buyer_personas')
+                .insert([personaData]);
+
+              if (personaError) {
+                console.error('Error al crear buyer persona:', personaError);
+              }
+            }
+          }
         }
       }
 
-      // Crear producto si hay datos
-      if (data.productName) {
-        const productData = {
-          organization_id: organization.id,
-          name: data.productName,
-          description: data.productDescription,
-          category: data.category,
-          price: data.price ? parseFloat(data.price) : null,
-          currency: data.currency,
+      // Procesar productos
+      if (data.products && data.products.length > 0) {
+        for (const product of data.products) {
+          if (product.productName) {
+            const productData = {
+              organization_id: organization.id,
+              name: product.productName,
+              description: product.productDescription,
+              category: product.category,
+              price: product.price ? parseFloat(product.price) : null,
+              currency: product.currency,
+              status: product.status
+            };
 
-          status: data.status
-        };
+            if (product.id) {
+              // Actualizar producto existente
+              const { error: productError } = await supabase
+                .from('products')
+                .update(productData)
+                .eq('id', product.id);
 
-        const { error: productError } = await supabase
-          .from('products')
-          .insert([productData]);
+              if (productError) {
+                console.error('Error al actualizar producto:', productError);
+              }
+            } else {
+              // Crear nuevo producto
+              const { error: productError } = await supabase
+                .from('products')
+                .insert([productData]);
 
-        if (productError) {
-          console.error('Error al crear producto:', productError);
+              if (productError) {
+                console.error('Error al crear producto:', productError);
+              }
+            }
+          }
         }
       }
 
       console.log(editingOrganization ? 'Organización actualizada exitosamente:' : 'Organización creada exitosamente:', organization);
-      setIsOrganizationModalOpen(false);
       setEditingOrganization(null);
+      setOrganizationPersonas([]);
+      setOrganizationProducts([]);
       
       // Recargar la lista de organizaciones
       await loadOrganizations();
@@ -1916,7 +2143,11 @@ const Dashboard: React.FC = () => {
                     </h1>
                     <button 
                       className="btn-primary"
-                      onClick={() => setIsOrganizationModalOpen(true)}
+                      onClick={() => {
+                        setIsEditMode(false);
+                        setEditingOrganization(null);
+                        setIsModalOpen(true);
+                      }}
                     >
                       <i className="fas fa-plus"></i>
                       Nueva Organización
@@ -2169,18 +2400,24 @@ const Dashboard: React.FC = () => {
         </main>
       </div>
       
-      {/* Modal de Nueva Organización */}
       <OrganizationModal
-        isOpen={isOrganizationModalOpen}
+        isOpen={isModalOpen}
         onClose={() => {
-          setIsOrganizationModalOpen(false);
+          setIsModalOpen(false);
+          setIsEditMode(false);
           setEditingOrganization(null);
         }}
-        onSubmit={handleOrganizationSubmit}
+        onSubmit={handleModalSubmit}
         editingOrganization={editingOrganization}
+        organizationPersonas={organizationPersonas}
+        organizationProducts={organizationProducts}
+        isEditMode={isEditMode}
       />
+
     </>
   );
 };
+
+
 
 export default Dashboard;

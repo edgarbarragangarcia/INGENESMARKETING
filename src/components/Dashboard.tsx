@@ -238,6 +238,8 @@ const Dashboard: React.FC = () => {
       // Limpiar estados de edición
       setIsEditMode(false);
       setEditingOrganization(null);
+      setOrganizationPersonas([]);
+      setOrganizationProducts([]);
        // Recargar organizaciones
        loadOrganizations();
        setIsModalOpen(false);
@@ -2406,6 +2408,8 @@ const Dashboard: React.FC = () => {
           setIsModalOpen(false);
           setIsEditMode(false);
           setEditingOrganization(null);
+          setOrganizationPersonas([]);
+          setOrganizationProducts([]);
         }}
         onSubmit={handleModalSubmit}
         editingOrganization={editingOrganization}

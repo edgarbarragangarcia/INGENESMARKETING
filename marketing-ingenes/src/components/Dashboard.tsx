@@ -384,6 +384,7 @@ const Dashboard: React.FC = () => {
            padding: 30px;
            min-height: calc(100vh - 60px);
            background: #ffffff;
+           font-size: 12px;
          }
          
          .content-container {
@@ -742,7 +743,7 @@ const Dashboard: React.FC = () => {
          }
          
          .page-title {
-           font-size: 32px;
+           font-size: 22px;
            font-weight: 800;
            color: #1e293b;
            display: flex;
@@ -809,7 +810,7 @@ const Dashboard: React.FC = () => {
            top: 50%;
            transform: translateY(-50%);
            color: #64748b;
-           font-size: 16px;
+           font-size: 14px;
          }
          
          .search-box input {
@@ -817,7 +818,7 @@ const Dashboard: React.FC = () => {
            padding: 12px 16px 12px 48px;
            border: 2px solid rgba(59, 130, 246, 0.1);
            border-radius: 12px;
-           font-size: 14px;
+           font-size: 11px;
            background: rgba(255, 255, 255, 0.8);
            transition: all 0.3s ease;
          }
@@ -834,7 +835,7 @@ const Dashboard: React.FC = () => {
          }
          
          .filter-btn {
-           padding: 8px 16px;
+           padding: 6px 14px;
            border: 2px solid rgba(59, 130, 246, 0.2);
            background: rgba(255, 255, 255, 0.8);
            color: #64748b;
@@ -842,6 +843,7 @@ const Dashboard: React.FC = () => {
            font-weight: 500;
            cursor: pointer;
            transition: all 0.3s ease;
+           font-size: 11px;
          }
          
          .filter-btn.active,
@@ -881,7 +883,7 @@ const Dashboard: React.FC = () => {
          }
          
          .table-cell {
-           font-size: 14px;
+           font-size: 11px;
            color: #475569;
          }
          
@@ -890,7 +892,7 @@ const Dashboard: React.FC = () => {
            color: #1e293b;
            text-transform: uppercase;
            letter-spacing: 0.5px;
-           font-size: 12px;
+           font-size: 10px;
          }
          
          .org-info {
@@ -921,19 +923,19 @@ const Dashboard: React.FC = () => {
          .org-name {
            font-weight: 600;
            color: #1e293b;
-           font-size: 15px;
+           font-size: 12px;
          }
          
          .org-code {
-           font-size: 12px;
+           font-size: 10px;
            color: #64748b;
            font-weight: 500;
          }
          
          .org-type {
-           padding: 4px 12px;
+           padding: 3px 10px;
            border-radius: 20px;
-           font-size: 12px;
+           font-size: 10px;
            font-weight: 600;
            text-transform: uppercase;
            letter-spacing: 0.5px;
@@ -955,9 +957,9 @@ const Dashboard: React.FC = () => {
          }
          
          .status {
-           padding: 4px 12px;
+           padding: 3px 10px;
            border-radius: 20px;
-           font-size: 12px;
+           font-size: 10px;
            font-weight: 600;
            text-transform: uppercase;
            letter-spacing: 0.5px;
@@ -979,8 +981,8 @@ const Dashboard: React.FC = () => {
          }
          
          .action-btn {
-           width: 36px;
-           height: 36px;
+           width: 32px;
+           height: 32px;
            border: none;
            border-radius: 8px;
            display: flex;
@@ -988,7 +990,7 @@ const Dashboard: React.FC = () => {
            justify-content: center;
            cursor: pointer;
            transition: all 0.3s ease;
-           font-size: 14px;
+           font-size: 12px;
          }
          
          .action-btn.edit {

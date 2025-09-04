@@ -1415,14 +1415,37 @@ function LandingPage() {
 
 export default function Home() {
   const [showDashboard, setShowDashboard] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    const initializeApp = async () => {
+      try {
+        // Verificar si hay una sesión activa
+        const currentUser = await authService.getCurrentUser();
+        
+        // Verificar el hash de la URL
+        const isDashboardHash = window.location.hash === '#dashboard';
+        
+        // Si hay usuario logueado y está en dashboard, o si hay hash de dashboard
+        if ((currentUser && isDashboardHash) || isDashboardHash) {
+          setShowDashboard(true);
+        } else {
+          setShowDashboard(false);
+        }
+      } catch (error) {
+        console.error('Error al inicializar la aplicación:', error);
+        setShowDashboard(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     const checkHash = () => {
       setShowDashboard(window.location.hash === '#dashboard');
     };
 
-    // Check initial hash
-    checkHash();
+    // Inicializar la aplicación
+    initializeApp();
 
     // Listen for hash changes
     window.addEventListener('hashchange', checkHash);
@@ -1431,6 +1454,42 @@ export default function Home() {
       window.removeEventListener('hashchange', checkHash);
     };
   }, []);
+
+  // Mostrar pantalla de carga mientras se verifica la autenticación
+  if (isLoading) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+        fontFamily: 'system-ui, -apple-system, sans-serif'
+      }}>
+        <div style={{
+          textAlign: 'center',
+          color: '#64748b'
+        }}>
+          <div style={{
+            width: '40px',
+            height: '40px',
+            border: '3px solid #e2e8f0',
+            borderTop: '3px solid #6366f1',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 16px'
+          }}></div>
+          <p>Cargando...</p>
+          <style jsx>{`
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+          `}</style>
+        </div>
+      </div>
+    );
+  }
 
   return showDashboard ? <Dashboard /> : <LandingPage />;
 }

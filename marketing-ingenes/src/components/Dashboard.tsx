@@ -16,6 +16,7 @@ const Dashboard: React.FC = () => {
 
   const handleNavClick = (section: string) => {
     setActiveSection(section);
+    localStorage.setItem('activeSection', section);
     setIsMobileMenuOpen(false);
   };
 
@@ -250,6 +251,10 @@ const Dashboard: React.FC = () => {
     const savedTheme = localStorage.getItem('theme') || 'system';
     setTheme(savedTheme);
     applyTheme(savedTheme);
+    
+    // Restaurar la sección activa desde localStorage
+    const savedSection = localStorage.getItem('activeSection') || 'dashboard';
+    setActiveSection(savedSection);
   }, []);
 
   return (

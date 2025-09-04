@@ -39,11 +39,7 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ isOpen, onClose, 
     category: '',
     price: '',
     currency: 'MXN',
-    targetAudience: [''],
-    keyBenefits: [''],
-    features: [''],
-    competitiveAdvantages: [''],
-    productImage: null as File | null,
+
     status: 'active'
   });
 
@@ -140,7 +136,7 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ isOpen, onClose, 
                   <div className={styles.formGroup}>
                     <label htmlFor="name">
                       <i className="fas fa-building"></i>
-                      Nombre de la Organización *
+                      Nombre de la Organización
                     </label>
                     <input
                       type="text"
@@ -148,7 +144,6 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ isOpen, onClose, 
                       value={formData.name}
                       onChange={(e) => handleInputChange('name', e.target.value)}
                       placeholder="Ej: Hospital General"
-                      required
                     />
                   </div>
                 </div>
@@ -219,7 +214,7 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ isOpen, onClose, 
                   </button>
                 </div>
 
-                <div className="form-group">
+                <div className={styles.formGroup}>
                   <label htmlFor="logo">
                     <i className="fas fa-image"></i>
                     Logo de la Organización
@@ -242,12 +237,12 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ isOpen, onClose, 
 
             {/* Pestaña Buyer Persona */}
             {activeTab === 'persona' && (
-              <div className="tab-panel">
-                <div className="form-row">
-                  <div className="form-group">
+              <div className={styles.tabPanel}>
+                <div className={styles.formRow}>
+                  <div className={styles.formGroup}>
                     <label htmlFor="personaName">
                       <i className="fas fa-user"></i>
-                      Nombre del Buyer Persona *
+                      Nombre del Buyer Persona
                     </label>
                     <input
                       type="text"
@@ -255,7 +250,6 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ isOpen, onClose, 
                       value={formData.personaName}
                       onChange={(e) => handleInputChange('personaName', e.target.value)}
                       placeholder="Ej: María González - Paciente Frecuente"
-                      required
                     />
                   </div>
                 </div>
@@ -401,13 +395,13 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ isOpen, onClose, 
                   </button>
                 </div>
 
-                <div className="form-group">
+                <div className={styles.formGroup}>
                   <label>
                     <i className="fas fa-target"></i>
                     Objetivos
                   </label>
                   {formData.goals.map((goal, index) => (
-                    <div key={index} className="array-input">
+                    <div key={index} className={styles.arrayInput}>
                       <input
                         type="text"
                         value={goal}
@@ -417,7 +411,7 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ isOpen, onClose, 
                       {formData.goals.length > 1 && (
                         <button
                           type="button"
-                          className="remove-btn"
+                          className={styles.removeBtn}
                           onClick={() => removeArrayItem('goals', index)}
                         >
                           <i className="fas fa-minus"></i>
@@ -427,7 +421,7 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ isOpen, onClose, 
                   ))}
                   <button
                     type="button"
-                    className="add-btn"
+                    className={styles.addBtn}
                     onClick={() => addArrayItem('goals')}
                   >
                     <i className="fas fa-plus"></i>
@@ -435,13 +429,13 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ isOpen, onClose, 
                   </button>
                 </div>
 
-                <div className="form-group">
+                <div className={styles.formGroup}>
                   <label>
                     <i className="fas fa-share-alt"></i>
                     Canales Preferidos
                   </label>
                   {formData.preferredChannels.map((channel, index) => (
-                    <div key={index} className="array-input">
+                    <div key={index} className={styles.arrayInput}>
                       <select
                         value={channel}
                         onChange={(e) => handleArrayChange('preferredChannels', index, e.target.value)}
@@ -460,7 +454,7 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ isOpen, onClose, 
                       {formData.preferredChannels.length > 1 && (
                         <button
                           type="button"
-                          className="remove-btn"
+                          className={styles.removeBtn}
                           onClick={() => removeArrayItem('preferredChannels', index)}
                         >
                           <i className="fas fa-minus"></i>
@@ -470,7 +464,7 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ isOpen, onClose, 
                   ))}
                   <button
                     type="button"
-                    className="add-btn"
+                    className={styles.addBtn}
                     onClick={() => addArrayItem('preferredChannels')}
                   >
                     <i className="fas fa-plus"></i>
@@ -478,8 +472,8 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ isOpen, onClose, 
                   </button>
                 </div>
 
-                <div className="form-row">
-                  <div className="form-group">
+                <div className={styles.formRow}>
+                  <div className={styles.formGroup}>
                     <label htmlFor="behaviorPatterns">
                       <i className="fas fa-chart-line"></i>
                       Patrones de Comportamiento
@@ -494,8 +488,8 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ isOpen, onClose, 
                   </div>
                 </div>
 
-                <div className="form-row">
-                  <div className="form-group half">
+                <div className={styles.formRow}>
+                  <div className={`${styles.formGroup} ${styles.half}`}>
                     <label htmlFor="motivations">
                       <i className="fas fa-heart"></i>
                       Motivaciones
@@ -508,7 +502,7 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ isOpen, onClose, 
                       rows={3}
                     />
                   </div>
-                  <div className="form-group half">
+                  <div className={`${styles.formGroup} ${styles.half}`}>
                     <label htmlFor="frustrations">
                       <i className="fas fa-frown"></i>
                       Frustraciones
@@ -523,19 +517,19 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ isOpen, onClose, 
                   </div>
                 </div>
 
-                <div className="form-group">
+                <div className={styles.formGroup}>
                   <label htmlFor="personaAvatar">
                     <i className="fas fa-user-circle"></i>
                     Avatar del Buyer Persona
                   </label>
-                  <div className="file-input">
+                  <div className={styles.fileInput}>
                     <input
                       type="file"
                       id="personaAvatar"
                       accept="image/*"
                       onChange={(e) => handleFileChange('personaAvatar', e.target.files?.[0] || null)}
                     />
-                    <label htmlFor="personaAvatar" className="file-label">
+                    <label htmlFor="personaAvatar" className={styles.fileLabel}>
                       <i className="fas fa-cloud-upload-alt"></i>
                       {formData.personaAvatar ? formData.personaAvatar.name : 'Seleccionar avatar'}
                     </label>
@@ -546,12 +540,12 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ isOpen, onClose, 
 
             {/* Pestaña Productos */}
             {activeTab === 'products' && (
-              <div className="tab-panel">
-                <div className="form-row">
-                  <div className="form-group">
+              <div className={styles.tabPanel}>
+                <div className={styles.formRow}>
+                  <div className={styles.formGroup}>
                     <label htmlFor="productName">
                       <i className="fas fa-box"></i>
-                      Nombre del Producto/Servicio *
+                      Nombre del Producto/Servicio
                     </label>
                     <input
                       type="text"
@@ -559,13 +553,12 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ isOpen, onClose, 
                       value={formData.productName}
                       onChange={(e) => handleInputChange('productName', e.target.value)}
                       placeholder="Ej: Consulta Médica General"
-                      required
                     />
                   </div>
                 </div>
 
-                <div className="form-row">
-                  <div className="form-group">
+                <div className={styles.formRow}>
+                  <div className={styles.formGroup}>
                     <label htmlFor="productDescription">
                       <i className="fas fa-align-left"></i>
                       Descripción
@@ -580,8 +573,8 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ isOpen, onClose, 
                   </div>
                 </div>
 
-                <div className="form-row">
-                  <div className="form-group half">
+                <div className={styles.formRow}>
+                  <div className={`${styles.formGroup} ${styles.half}`}>
                     <label htmlFor="category">
                       <i className="fas fa-tags"></i>
                       Categoría
@@ -601,7 +594,7 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ isOpen, onClose, 
                       <option value="Especialidades">Especialidades</option>
                     </select>
                   </div>
-                  <div className="form-group half">
+                  <div className={`${styles.formGroup} ${styles.half}`}>
                     <label htmlFor="status">
                       <i className="fas fa-toggle-on"></i>
                       Estado
@@ -618,8 +611,8 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ isOpen, onClose, 
                   </div>
                 </div>
 
-                <div className="form-row">
-                  <div className="form-group half">
+                <div className={styles.formRow}>
+                  <div className={`${styles.formGroup} ${styles.half}`}>
                     <label htmlFor="price">
                       <i className="fas fa-dollar-sign"></i>
                       Precio
@@ -634,7 +627,7 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ isOpen, onClose, 
                       min="0"
                     />
                   </div>
-                  <div className="form-group half">
+                  <div className={`${styles.formGroup} ${styles.half}`}>
                     <label htmlFor="currency">
                       <i className="fas fa-coins"></i>
                       Moneda
@@ -651,160 +644,7 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({ isOpen, onClose, 
                   </div>
                 </div>
 
-                <div className="form-group">
-                  <label>
-                    <i className="fas fa-users"></i>
-                    Audiencia Objetivo
-                  </label>
-                  {formData.targetAudience.map((audience, index) => (
-                    <div key={index} className="array-input">
-                      <input
-                        type="text"
-                        value={audience}
-                        onChange={(e) => handleArrayChange('targetAudience', index, e.target.value)}
-                        placeholder={`Audiencia ${index + 1}`}
-                      />
-                      {formData.targetAudience.length > 1 && (
-                        <button
-                          type="button"
-                          className="remove-btn"
-                          onClick={() => removeArrayItem('targetAudience', index)}
-                        >
-                          <i className="fas fa-minus"></i>
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                  <button
-                    type="button"
-                    className="add-btn"
-                    onClick={() => addArrayItem('targetAudience')}
-                  >
-                    <i className="fas fa-plus"></i>
-                    Agregar Audiencia
-                  </button>
-                </div>
 
-                <div className="form-group">
-                  <label>
-                    <i className="fas fa-star"></i>
-                    Beneficios Clave
-                  </label>
-                  {formData.keyBenefits.map((benefit, index) => (
-                    <div key={index} className="array-input">
-                      <input
-                        type="text"
-                        value={benefit}
-                        onChange={(e) => handleArrayChange('keyBenefits', index, e.target.value)}
-                        placeholder={`Beneficio ${index + 1}`}
-                      />
-                      {formData.keyBenefits.length > 1 && (
-                        <button
-                          type="button"
-                          className="remove-btn"
-                          onClick={() => removeArrayItem('keyBenefits', index)}
-                        >
-                          <i className="fas fa-minus"></i>
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                  <button
-                    type="button"
-                    className="add-btn"
-                    onClick={() => addArrayItem('keyBenefits')}
-                  >
-                    <i className="fas fa-plus"></i>
-                    Agregar Beneficio
-                  </button>
-                </div>
-
-                <div className="form-group">
-                  <label>
-                    <i className="fas fa-list"></i>
-                    Características
-                  </label>
-                  {formData.features.map((feature, index) => (
-                    <div key={index} className="array-input">
-                      <input
-                        type="text"
-                        value={feature}
-                        onChange={(e) => handleArrayChange('features', index, e.target.value)}
-                        placeholder={`Característica ${index + 1}`}
-                      />
-                      {formData.features.length > 1 && (
-                        <button
-                          type="button"
-                          className="remove-btn"
-                          onClick={() => removeArrayItem('features', index)}
-                        >
-                          <i className="fas fa-minus"></i>
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                  <button
-                    type="button"
-                    className="add-btn"
-                    onClick={() => addArrayItem('features')}
-                  >
-                    <i className="fas fa-plus"></i>
-                    Agregar Característica
-                  </button>
-                </div>
-
-                <div className="form-group">
-                  <label>
-                    <i className="fas fa-trophy"></i>
-                    Ventajas Competitivas
-                  </label>
-                  {formData.competitiveAdvantages.map((advantage, index) => (
-                    <div key={index} className="array-input">
-                      <input
-                        type="text"
-                        value={advantage}
-                        onChange={(e) => handleArrayChange('competitiveAdvantages', index, e.target.value)}
-                        placeholder={`Ventaja ${index + 1}`}
-                      />
-                      {formData.competitiveAdvantages.length > 1 && (
-                        <button
-                          type="button"
-                          className="remove-btn"
-                          onClick={() => removeArrayItem('competitiveAdvantages', index)}
-                        >
-                          <i className="fas fa-minus"></i>
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                  <button
-                    type="button"
-                    className="add-btn"
-                    onClick={() => addArrayItem('competitiveAdvantages')}
-                  >
-                    <i className="fas fa-plus"></i>
-                    Agregar Ventaja
-                  </button>
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="productImage">
-                    <i className="fas fa-image"></i>
-                    Imagen del Producto
-                  </label>
-                  <div className="file-input">
-                    <input
-                      type="file"
-                      id="productImage"
-                      accept="image/*"
-                      onChange={(e) => handleFileChange('productImage', e.target.files?.[0] || null)}
-                    />
-                    <label htmlFor="productImage" className="file-label">
-                      <i className="fas fa-cloud-upload-alt"></i>
-                      {formData.productImage ? formData.productImage.name : 'Seleccionar imagen'}
-                    </label>
-                  </div>
-                </div>
               </div>
             )}
           </div>

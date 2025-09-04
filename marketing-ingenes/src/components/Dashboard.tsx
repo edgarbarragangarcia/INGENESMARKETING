@@ -109,10 +109,7 @@ const Dashboard: React.FC = () => {
           category: data.category,
           price: data.price ? parseFloat(data.price) : null,
           currency: data.currency,
-          target_audience: data.targetAudience.filter((audience: string) => audience.trim() !== ''),
-          key_benefits: data.keyBenefits.filter((benefit: string) => benefit.trim() !== ''),
-          features: data.features.filter((feature: string) => feature.trim() !== ''),
-          competitive_advantages: data.competitiveAdvantages.filter((advantage: string) => advantage.trim() !== ''),
+
           status: data.status
         };
 

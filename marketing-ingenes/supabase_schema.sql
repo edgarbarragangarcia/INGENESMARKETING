@@ -45,11 +45,7 @@ CREATE TABLE IF NOT EXISTS products (
     category VARCHAR(100),
     price DECIMAL(10,2),
     currency VARCHAR(10) DEFAULT 'MXN',
-    target_audience TEXT[],
-    key_benefits TEXT[],
-    features TEXT[],
-    competitive_advantages TEXT[],
-    image_url TEXT,
+
     status VARCHAR(50) DEFAULT 'active',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()

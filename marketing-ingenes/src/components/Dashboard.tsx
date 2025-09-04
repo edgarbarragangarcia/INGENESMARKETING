@@ -1601,10 +1601,18 @@ const Dashboard: React.FC = () => {
                               </div>
                               <div className="table-cell">
                                 <div className="action-buttons">
-                                  <button className="action-btn edit">
+                                  <button 
+                                    className="action-btn edit"
+                                    onClick={() => handleEditOrganization(org)}
+                                    title="Editar organización"
+                                  >
                                     <i className="fas fa-edit"></i>
                                   </button>
-                                  <button className="action-btn delete">
+                                  <button 
+                                    className="action-btn delete"
+                                    onClick={() => handleDeleteOrganization(org.id)}
+                                    title="Eliminar organización"
+                                  >
                                     <i className="fas fa-trash"></i>
                                   </button>
                                 </div>

@@ -149,8 +149,8 @@ function handleAuthSuccess(user) {
     // Cerrar modal
     closeModal();
     
-    // Mostrar mensaje de bienvenida
-    showWelcomeMessage(currentUser.name);
+    // Mostrar mensaje de bienvenida y redirección
+    showNotification('¡Bienvenido! Redirigiendo al dashboard...', 'success');
     
     // Actualizar UI
     updateUIForLoggedInUser();
@@ -158,6 +158,11 @@ function handleAuthSuccess(user) {
     // Guardar en localStorage (opcional)
     localStorage.setItem('user', JSON.stringify(currentUser));
     localStorage.setItem('isLoggedIn', 'true');
+    
+    // Redireccionar al dashboard después de 2 segundos
+    setTimeout(() => {
+        window.location.href = 'dashboard.html';
+    }, 2000);
 }
 
 // Configurar event listeners
@@ -387,9 +392,9 @@ function showUserMenu() {
 // Funciones de navegación
 function goToDashboard() {
     showNotification('Redirigiendo al dashboard...', 'info');
-    // En producción, redirigir a la aplicación principal
+    // Redireccionar al dashboard
     setTimeout(() => {
-        window.location.href = '/dashboard';
+        window.location.href = 'dashboard.html';
     }, 1000);
 }
 

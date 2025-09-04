@@ -2901,20 +2901,25 @@ const Dashboard: React.FC = () => {
          .minimalist-metrics {
            display: grid;
            grid-template-columns: repeat(4, 1fr);
-           gap: 25px;
-           margin-bottom: 40px;
+           gap: 15px;
+           margin-bottom: 30px;
          }
 
          .minimalist-metric {
            background: linear-gradient(145deg, #ffffff, #f8fafc);
-           padding: 30px 25px;
-           border-radius: 20px;
-           box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+           padding: 20px 15px;
+           border-radius: 16px;
+           box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06), 0 1px 4px rgba(0, 0, 0, 0.03);
            text-align: center;
-           transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+           transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
            border: 1px solid rgba(255, 255, 255, 0.8);
            position: relative;
            overflow: hidden;
+           min-height: 120px;
+           display: flex;
+           flex-direction: column;
+           justify-content: center;
+           align-items: center;
          }
 
          .minimalist-metric::before {
@@ -2933,35 +2938,35 @@ const Dashboard: React.FC = () => {
          }
 
          .minimalist-metric:hover {
-           transform: translateY(-8px) scale(1.02);
-           box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), 0 8px 16px rgba(102, 126, 234, 0.2);
-           border-color: rgba(102, 126, 234, 0.3);
+           transform: translateY(-4px) scale(1.01);
+           box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(102, 126, 234, 0.15);
+           border-color: rgba(102, 126, 234, 0.25);
          }
 
          .minimalist-metric-icon {
-           width: 48px;
-           height: 48px;
-           margin: 0 auto 16px;
+           width: 32px;
+           height: 32px;
+           margin: 0 auto 10px;
            color: #667eea;
-           filter: drop-shadow(0 2px 4px rgba(102, 126, 234, 0.2));
+           filter: drop-shadow(0 1px 3px rgba(102, 126, 234, 0.2));
          }
 
          .minimalist-metric-value {
-           font-size: 32px;
+           font-size: 24px;
            font-weight: 800;
            background: linear-gradient(135deg, #1a1a1a 0%, #4a5568 100%);
            -webkit-background-clip: text;
            -webkit-text-fill-color: transparent;
            background-clip: text;
-           margin-bottom: 8px;
-           text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+           margin-bottom: 6px;
+           text-shadow: 0 1px 2px rgba(0,0,0,0.1);
          }
 
          .minimalist-metric-label {
-           font-size: 15px;
+           font-size: 12px;
            color: #64748b;
            font-weight: 600;
-           letter-spacing: 0.5px;
+           letter-spacing: 0.3px;
            text-transform: uppercase;
          }
 
@@ -3245,10 +3250,31 @@ const Dashboard: React.FC = () => {
          @media (max-width: 768px) {
            .minimalist-metrics {
              grid-template-columns: repeat(2, 1fr);
+             gap: 12px;
+           }
+
+           .minimalist-metric {
+             min-height: 100px;
+             padding: 15px 10px;
+           }
+
+           .minimalist-metric-icon {
+             width: 28px;
+             height: 28px;
+             margin: 0 auto 8px;
+           }
+
+           .minimalist-metric-value {
+             font-size: 20px;
+             margin-bottom: 4px;
+           }
+
+           .minimalist-metric-label {
+             font-size: 11px;
            }
 
            .minimalist-dashboard {
-             padding: 15px;
+             padding: 20px;
            }
 
            .dashboard-grid {
@@ -3362,35 +3388,47 @@ const Dashboard: React.FC = () => {
           <div className="content-container">
             {activeSection === 'dashboard' && (
               <>
-                <div className="minimal-dashboard">
-                  {/* Métricas Compactas */}
-                  <div className="compact-metrics">
-                    <div className="metric-item">
-                      <OrganizationIcon size={16} />
-                      <span className="metric-value">{organizations.length}</span>
-                      <span className="metric-label">Organizaciones</span>
+                <div className="minimalist-dashboard">
+                  <div className="minimalist-header">
+                    <h1 className="minimalist-title">Dashboard de Marketing</h1>
+                  </div>
+                  
+                  {/* Métricas en Cards */}
+                  <div className="minimalist-metrics">
+                    <div className="minimalist-metric">
+                      <div className="minimalist-metric-icon">
+                        <OrganizationIcon size={32} />
+                      </div>
+                      <div className="minimalist-metric-value">{organizations.length}</div>
+                      <div className="minimalist-metric-label">Organizaciones</div>
                     </div>
-                    <div className="metric-item">
-                      <ProductIcon size={16} />
-                      <span className="metric-value">{products.length}</span>
-                      <span className="metric-label">Productos</span>
+                    <div className="minimalist-metric">
+                      <div className="minimalist-metric-icon">
+                        <ProductIcon size={32} />
+                      </div>
+                      <div className="minimalist-metric-value">{products.length}</div>
+                      <div className="minimalist-metric-label">Productos</div>
                     </div>
-                    <div className="metric-item">
-                      <CreativeIcon size={16} />
-                      <span className="metric-value">12</span>
-                      <span className="metric-label">Conceptos</span>
+                    <div className="minimalist-metric">
+                      <div className="minimalist-metric-icon">
+                        <CreativeIcon size={32} />
+                      </div>
+                      <div className="minimalist-metric-value">12</div>
+                      <div className="minimalist-metric-label">Conceptos</div>
                     </div>
-                    <div className="metric-item">
-                      <ChartIcon size={16} />
-                      <span className="metric-value">285%</span>
-                      <span className="metric-label">ROI</span>
+                    <div className="minimalist-metric">
+                      <div className="minimalist-metric-icon">
+                        <ChartIcon size={32} />
+                      </div>
+                      <div className="minimalist-metric-value">285%</div>
+                      <div className="minimalist-metric-label">ROI</div>
                     </div>
                   </div>
 
                   {/* Layout de dos columnas */}
                   <div className="dashboard-grid">
                     {/* Gráfica de Barras Simple */}
-                    <div className="simple-chart">
+                    <div className="minimalist-chart">
                       <h3 className="chart-title">Rendimiento Mensual</h3>
                       <div className="bar-chart">
                         <div className="bar" style={{height: '60%'}}>

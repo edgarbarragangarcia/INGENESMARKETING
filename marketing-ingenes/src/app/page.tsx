@@ -63,15 +63,21 @@ function LandingPage() {
           top: 0;
           left: 0;
           right: 0;
-          background: rgba(255, 255, 255, 0.95);
-          backdrop-filter: blur(10px);
-          border-bottom: 1px solid var(--border-color);
+          background: linear-gradient(135deg, 
+            rgba(255, 182, 193, 0.3) 0%,
+            rgba(173, 216, 230, 0.3) 25%,
+            rgba(221, 160, 221, 0.3) 50%,
+            rgba(255, 218, 185, 0.3) 75%,
+            rgba(240, 248, 255, 0.3) 100%);
+          backdrop-filter: blur(15px);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.2);
           z-index: 1000;
           transition: var(--transition);
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
         }
         
         .navbar {
-          padding: 1rem 0;
+          padding: 0;
         }
         
         .nav-container {
@@ -81,41 +87,40 @@ function LandingPage() {
           display: flex;
           align-items: center;
           justify-content: space-between;
+          height: 60px;
         }
         
         .nav-logo {
           display: flex;
           align-items: center;
-          gap: 0.5rem;
-          font-size: 1.5rem;
+          gap: 12px;
           font-weight: 700;
           color: var(--primary-color);
           text-decoration: none;
         }
         
         .nav-logo i {
-          font-size: 1.8rem;
+          font-size: 24px;
         }
         
         .logo-text {
           display: flex;
           flex-direction: column;
-          line-height: 1;
+          line-height: 1.2;
         }
         
         .logo-main {
-          font-size: 1.5rem;
-          font-weight: 700;
+          font-size: 18px;
+          font-weight: 800;
           color: var(--primary-color);
         }
         
         .logo-sub {
-          font-size: 0.6rem;
+          font-size: 10px;
           font-weight: 500;
           color: var(--text-secondary);
           text-transform: uppercase;
           letter-spacing: 0.5px;
-          margin-top: -2px;
         }
         
         .nav-auth {
@@ -131,6 +136,7 @@ function LandingPage() {
           padding: 0.5rem 1rem;
           border-radius: var(--border-radius);
           font-weight: 500;
+          font-size: 14px;
           cursor: pointer;
           transition: var(--transition);
           display: flex;
@@ -150,6 +156,7 @@ function LandingPage() {
           padding: 0.5rem 1rem;
           border-radius: var(--border-radius);
           font-weight: 500;
+          font-size: 14px;
           cursor: pointer;
           transition: var(--transition);
         }
@@ -277,6 +284,13 @@ function LandingPage() {
           padding: 20px;
           box-shadow: var(--shadow-xl);
           border: 1px solid var(--border-color);
+          animation: phoneFloat 3s ease-in-out infinite;
+          transform-origin: center;
+        }
+        
+        @keyframes phoneFloat {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-10px) rotate(1deg); }
         }
         
         .mockup-header {
@@ -295,14 +309,22 @@ function LandingPage() {
           height: 12px;
           border-radius: 50%;
           background: #ff5f57;
+          animation: dotPulse 2s ease-in-out infinite;
         }
         
         .mockup-dots span:nth-child(2) {
           background: #ffbd2e;
+          animation-delay: 0.3s;
         }
         
         .mockup-dots span:nth-child(3) {
           background: #28ca42;
+          animation-delay: 0.6s;
+        }
+        
+        @keyframes dotPulse {
+          0%, 100% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(1.2); opacity: 0.8; }
         }
         
         .mockup-content {
@@ -316,12 +338,49 @@ function LandingPage() {
           border-radius: 12px;
           padding: 15px;
           border: 1px solid #e2e8f0;
+          animation: cardSlideUp 4s ease-in-out infinite;
+          transform: translateY(0);
+        }
+        
+        .mockup-card:nth-child(2) {
+          animation-delay: 2s;
+        }
+        
+        @keyframes cardSlideUp {
+          0%, 90%, 100% { transform: translateY(0); opacity: 1; }
+          10%, 80% { transform: translateY(-5px); opacity: 0.9; }
+          50% { transform: translateY(-15px); opacity: 0.7; }
         }
         
         .card-header {
           font-weight: 600;
           margin-bottom: 10px;
           color: var(--text-primary);
+          position: relative;
+        }
+        
+        .card-header::after {
+          content: '';
+          position: absolute;
+          right: 10px;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 20px;
+          height: 20px;
+          border: 2px solid #4ade80;
+          border-top: 2px solid transparent;
+          border-radius: 50%;
+          animation: uploadSpin 1.5s linear infinite;
+          opacity: 0;
+        }
+        
+        .mockup-card:hover .card-header::after {
+          opacity: 1;
+        }
+        
+        @keyframes uploadSpin {
+          0% { transform: translateY(-50%) rotate(0deg); }
+          100% { transform: translateY(-50%) rotate(360deg); }
         }
         
         .card-image {
@@ -330,6 +389,39 @@ function LandingPage() {
           background: linear-gradient(45deg, #667eea, #764ba2);
           border-radius: 8px;
           margin-bottom: 10px;
+          position: relative;
+          overflow: hidden;
+        }
+        
+        .card-image::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+          animation: imageShimmer 3s ease-in-out infinite;
+        }
+        
+        @keyframes imageShimmer {
+          0% { left: -100%; }
+          50%, 100% { left: 100%; }
+        }
+        
+        .card-image::after {
+          content: '📸';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          font-size: 24px;
+          animation: imageUpload 4s ease-in-out infinite;
+        }
+        
+        @keyframes imageUpload {
+          0%, 70%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.7; }
+          35% { transform: translate(-50%, -70%) scale(1.2); opacity: 1; }
         }
         
         .card-text {
@@ -337,6 +429,25 @@ function LandingPage() {
           background: #cbd5e1;
           border-radius: 4px;
           margin-bottom: 5px;
+          position: relative;
+          overflow: hidden;
+        }
+        
+        .card-text::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          height: 100%;
+          background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+          border-radius: 4px;
+          animation: textProgress 5s ease-in-out infinite;
+        }
+        
+        @keyframes textProgress {
+          0% { width: 0%; }
+          50% { width: 100%; }
+          100% { width: 100%; }
         }
         
         .card-lines {
@@ -349,10 +460,51 @@ function LandingPage() {
           height: 8px;
           background: #cbd5e1;
           border-radius: 4px;
+          position: relative;
+          overflow: hidden;
+        }
+        
+        .line::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          height: 100%;
+          background: linear-gradient(90deg, #10b981, #06b6d4);
+          border-radius: 4px;
+          animation: lineProgress 3s ease-in-out infinite;
+        }
+        
+        .line:nth-child(1)::before { animation-delay: 0s; }
+        .line:nth-child(2)::before { animation-delay: 0.5s; }
+        .line:nth-child(3)::before { animation-delay: 1s; }
+        
+        @keyframes lineProgress {
+          0% { width: 0%; }
+          70% { width: 100%; }
+          100% { width: 100%; }
         }
         
         .line.short {
           width: 60%;
+        }
+        
+        .line.short::before {
+          animation: lineProgressShort 3s ease-in-out infinite;
+        }
+        
+        @keyframes lineProgressShort {
+          0% { width: 0%; }
+          70% { width: 100%; }
+          100% { width: 100%; }
+        }
+        
+        .mockup-screen:hover {
+          animation-play-state: paused;
+        }
+        
+        .mockup-screen:hover .mockup-card {
+          animation-play-state: paused;
         }
         
         .features {

@@ -10,6 +10,9 @@ const Dashboard: React.FC = () => {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [theme, setTheme] = useState('system');
   const [isOrganizationModalOpen, setIsOrganizationModalOpen] = useState(false);
+  const [organizations, setOrganizations] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editingOrganization, setEditingOrganization] = useState<any>(null);
 
   const handleNavClick = (section: string) => {
     setActiveSection(section);
@@ -43,6 +46,64 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const loadOrganizations = async () => {
+    try {
+      setLoading(true);
+      const user = await authService.getCurrentUser();
+      
+      if (!user) {
+        console.error('Usuario no autenticado');
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('organizations')
+        .select('*')
+        .eq('created_by', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error al cargar organizaciones:', error);
+        return;
+      }
+
+      setOrganizations(data || []);
+    } catch (error) {
+      console.error('Error al cargar organizaciones:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadOrganizations();
+  }, []);
+
+  const handleEditOrganization = (organization: any) => {
+    setEditingOrganization(organization);
+    setIsOrganizationModalOpen(true);
+  };
+
+  const handleDeleteOrganization = async (organizationId: string) => {
+    if (window.confirm('¿Estás seguro de que quieres eliminar esta organización?')) {
+      try {
+        const { error } = await supabase
+          .from('organizations')
+          .delete()
+          .eq('id', organizationId);
+
+        if (error) {
+          console.error('Error al eliminar organización:', error);
+          return;
+        }
+
+        await loadOrganizations();
+      } catch (error) {
+        console.error('Error al eliminar organización:', error);
+      }
+    }
+  };
+
   const handleOrganizationSubmit = async (data: any) => {
     try {
       const user = await authService.getCurrentUser();
@@ -52,7 +113,6 @@ const Dashboard: React.FC = () => {
         return;
       }
 
-      // Crear organización
       const organizationData = {
         name: data.name,
         mission: data.mission,
@@ -61,15 +121,35 @@ const Dashboard: React.FC = () => {
         created_by: user.id
       };
 
-      const { data: organization, error: orgError } = await supabase
-        .from('organizations')
-        .insert([organizationData])
-        .select()
-        .single();
+      let organization;
+      
+      if (editingOrganization) {
+        // Actualizar organización existente
+        const { data: updatedOrg, error: orgError } = await supabase
+          .from('organizations')
+          .update(organizationData)
+          .eq('id', editingOrganization.id)
+          .select()
+          .single();
 
-      if (orgError) {
-        console.error('Error al crear organización:', orgError);
-        return;
+        if (orgError) {
+          console.error('Error al actualizar organización:', orgError);
+          return;
+        }
+        organization = updatedOrg;
+      } else {
+        // Crear nueva organización
+        const { data: newOrg, error: orgError } = await supabase
+          .from('organizations')
+          .insert([organizationData])
+          .select()
+          .single();
+
+        if (orgError) {
+          console.error('Error al crear organización:', orgError);
+          return;
+        }
+        organization = newOrg;
       }
 
       // Crear buyer persona si hay datos
@@ -122,11 +202,12 @@ const Dashboard: React.FC = () => {
         }
       }
 
-      console.log('Organización creada exitosamente:', organization);
+      console.log(editingOrganization ? 'Organización actualizada exitosamente:' : 'Organización creada exitosamente:', organization);
       setIsOrganizationModalOpen(false);
+      setEditingOrganization(null);
       
-      // Opcional: Recargar la página o actualizar la lista de organizaciones
-      window.location.reload();
+      // Recargar la lista de organizaciones
+      await loadOrganizations();
       
     } catch (error) {
       console.error('Error al crear organización:', error);
@@ -1482,101 +1563,55 @@ const Dashboard: React.FC = () => {
                         </div>
                       </div>
                       <div className="table-body">
-                        <div className="table-row">
-                          <div className="table-cell">
-                            <div className="org-info">
-                              <div className="org-avatar">
-                                <i className="fas fa-hospital"></i>
-                              </div>
-                              <div className="org-details">
-                                <span className="org-name">Hospital General</span>
-                                <span className="org-code">HG-001</span>
-                              </div>
+                        {loading ? (
+                          <div className="table-row">
+                            <div className="table-cell" style={{textAlign: 'center', padding: '40px', gridColumn: '1 / -1'}}>
+                              <i className="fas fa-spinner fa-spin" style={{marginRight: '10px'}}></i>
+                              Cargando organizaciones...
                             </div>
                           </div>
-                          <div className="table-cell">
-                            <span className="org-type hospital">Hospital</span>
-                          </div>
-                          <div className="table-cell">Ciudad de México</div>
-                          <div className="table-cell">1,247</div>
-                          <div className="table-cell">
-                            <span className="status active">Activa</span>
-                          </div>
-                          <div className="table-cell">
-                            <div className="action-buttons">
-                              <button className="action-btn edit">
-                                <i className="fas fa-edit"></i>
-                              </button>
-                              <button className="action-btn delete">
-                                <i className="fas fa-trash"></i>
-                              </button>
+                        ) : organizations.length === 0 ? (
+                          <div className="table-row">
+                            <div className="table-cell" style={{textAlign: 'center', padding: '40px', gridColumn: '1 / -1'}}>
+                              <i className="fas fa-building" style={{marginRight: '10px', opacity: 0.5}}></i>
+                              No hay organizaciones creadas. ¡Crea tu primera organización!
                             </div>
                           </div>
-                        </div>
-                        
-                        <div className="table-row">
-                          <div className="table-cell">
-                            <div className="org-info">
-                              <div className="org-avatar">
-                                <i className="fas fa-clinic-medical"></i>
+                        ) : (
+                          organizations.map((org, index) => (
+                            <div key={org.id} className="table-row">
+                              <div className="table-cell">
+                                <div className="org-info">
+                                  <div className="org-avatar">
+                                    <i className="fas fa-building"></i>
+                                  </div>
+                                  <div className="org-details">
+                                    <span className="org-name">{org.name}</span>
+                                    <span className="org-code">ORG-{String(index + 1).padStart(3, '0')}</span>
+                                  </div>
+                                </div>
                               </div>
-                              <div className="org-details">
-                                <span className="org-name">Clínica San Rafael</span>
-                                <span className="org-code">CSR-002</span>
+                              <div className="table-cell">
+                                <span className="org-type hospital">Organización</span>
                               </div>
-                            </div>
-                          </div>
-                          <div className="table-cell">
-                            <span className="org-type clinic">Clínica</span>
-                          </div>
-                          <div className="table-cell">Guadalajara</div>
-                          <div className="table-cell">543</div>
-                          <div className="table-cell">
-                            <span className="status active">Activa</span>
-                          </div>
-                          <div className="table-cell">
-                            <div className="action-buttons">
-                              <button className="action-btn edit">
-                                <i className="fas fa-edit"></i>
-                              </button>
-                              <button className="action-btn delete">
-                                <i className="fas fa-trash"></i>
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="table-row">
-                          <div className="table-cell">
-                            <div className="org-info">
-                              <div className="org-avatar">
-                                <i className="fas fa-user-md"></i>
+                              <div className="table-cell">-</div>
+                              <div className="table-cell">-</div>
+                              <div className="table-cell">
+                                <span className="status active">Activa</span>
                               </div>
-                              <div className="org-details">
-                                <span className="org-name">Centro Médico Monterrey</span>
-                                <span className="org-code">CMM-003</span>
+                              <div className="table-cell">
+                                <div className="action-buttons">
+                                  <button className="action-btn edit">
+                                    <i className="fas fa-edit"></i>
+                                  </button>
+                                  <button className="action-btn delete">
+                                    <i className="fas fa-trash"></i>
+                                  </button>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                          <div className="table-cell">
-                            <span className="org-type center">Centro Médico</span>
-                          </div>
-                          <div className="table-cell">Monterrey</div>
-                          <div className="table-cell">892</div>
-                          <div className="table-cell">
-                            <span className="status inactive">Inactiva</span>
-                          </div>
-                          <div className="table-cell">
-                            <div className="action-buttons">
-                              <button className="action-btn edit">
-                                <i className="fas fa-edit"></i>
-                              </button>
-                              <button className="action-btn delete">
-                                <i className="fas fa-trash"></i>
-                              </button>
-                            </div>
-                          </div>
-                        </div>
+                          ))
+                        )}
                       </div>
                     </div>
                   </div>

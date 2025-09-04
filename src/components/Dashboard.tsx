@@ -106,6 +106,7 @@ const Dashboard: React.FC = () => {
   });
   const [organizationPersonas, setOrganizationPersonas] = useState<any[]>([]);
   const [organizationProducts, setOrganizationProducts] = useState<any[]>([]);
+  const [conceptoBuyerPersonas, setConceptoBuyerPersonas] = useState<any[]>([]);
 
   // Función para manejar el envío del modal
   const handleModalSubmit = async (formData: any) => {
@@ -161,15 +162,21 @@ const Dashboard: React.FC = () => {
 
 
       // Procesar buyer personas
+      console.log('Procesando buyer personas:', formData.buyerPersonas);
       if (isEditMode && editingOrganization) {
         // En modo edición, eliminar personas existentes y crear nuevas
-        await supabase
+        const { error: deletePersonasError } = await supabase
           .from('buyer_personas')
           .delete()
           .eq('organization_id', editingOrganization.id);
+        
+        if (deletePersonasError) {
+          console.error('Error al eliminar buyer personas existentes:', deletePersonasError);
+        }
       }
       
       if (formData.buyerPersonas && formData.buyerPersonas.length > 0) {
+        console.log('Insertando', formData.buyerPersonas.length, 'buyer personas');
         for (const persona of formData.buyerPersonas) {
           if (persona.personaName) {
             const personaData = {
@@ -189,27 +196,37 @@ const Dashboard: React.FC = () => {
               frustrations: persona.frustrations
             };
 
-            const { error: personaError } = await supabase
+            console.log('Insertando buyer persona:', personaData);
+            const { data: personaResult, error: personaError } = await supabase
               .from('buyer_personas')
-              .insert([personaData]);
+              .insert([personaData])
+              .select();
 
             if (personaError) {
               console.error('Error al crear buyer persona:', personaError);
+            } else {
+              console.log('Buyer persona creado exitosamente:', personaResult);
             }
           }
         }
       }
 
       // Procesar productos
+      console.log('Procesando productos:', formData.products);
       if (isEditMode && editingOrganization) {
         // En modo edición, eliminar productos existentes y crear nuevos
-        await supabase
+        const { error: deleteProductsError } = await supabase
           .from('products')
           .delete()
           .eq('organization_id', editingOrganization.id);
+        
+        if (deleteProductsError) {
+          console.error('Error al eliminar productos existentes:', deleteProductsError);
+        }
       }
       
       if (formData.products && formData.products.length > 0) {
+        console.log('Insertando', formData.products.length, 'productos');
         for (const product of formData.products) {
           if (product.productName) {
             const productData = {
@@ -222,12 +239,16 @@ const Dashboard: React.FC = () => {
               status: product.status
             };
 
-            const { error: productError } = await supabase
+            console.log('Insertando producto:', productData);
+            const { data: productResult, error: productError } = await supabase
               .from('products')
-              .insert([productData]);
+              .insert([productData])
+              .select();
 
             if (productError) {
               console.error('Error al crear producto:', productError);
+            } else {
+              console.log('Producto creado exitosamente:', productResult);
             }
           }
         }
@@ -525,6 +546,25 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const loadBuyerPersonas = async (organizationId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('buyer_personas')
+        .select('*')
+        .eq('organization_id', organizationId)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error al cargar buyer personas:', error);
+        return;
+      }
+
+      setConceptoBuyerPersonas(data || []);
+    } catch (error) {
+      console.error('Error al cargar buyer personas:', error);
+    }
+  };
+
   const handleOrganizacionChange = (organizacionId: string) => {
     setConceptoCreativo(prev => ({
       ...prev,
@@ -534,8 +574,10 @@ const Dashboard: React.FC = () => {
     
     if (organizacionId) {
       loadProducts(organizacionId);
+      loadBuyerPersonas(organizacionId);
     } else {
       setProducts([]);
+      setConceptoBuyerPersonas([]);
     }
   };
 
@@ -1765,6 +1807,71 @@ const Dashboard: React.FC = () => {
            font-size: 14px;
          }
          
+         /* Buyer Personas Styles */
+         .personas-grid {
+           display: grid;
+           grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+           gap: 20px;
+         }
+         
+         .persona-card {
+           background: rgba(255, 255, 255, 0.9);
+           border: 2px solid rgba(59, 130, 246, 0.1);
+           border-radius: 16px;
+           padding: 20px;
+           transition: all 0.3s ease;
+         }
+         
+         .persona-card:hover {
+           border-color: #3b82f6;
+           box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
+           transform: translateY(-2px);
+         }
+         
+         .persona-header {
+           margin-bottom: 16px;
+         }
+         
+         .persona-name {
+           font-size: 16px;
+           font-weight: 600;
+           color: #1e293b;
+           margin: 0;
+         }
+         
+         .persona-details {
+           display: flex;
+           flex-direction: column;
+           gap: 8px;
+         }
+         
+         .persona-details p {
+           margin: 0;
+           font-size: 14px;
+           color: #64748b;
+         }
+         
+         .persona-details strong {
+           color: #1e293b;
+         }
+         
+         .no-personas {
+           text-align: center;
+           padding: 40px 20px;
+           color: #64748b;
+         }
+         
+         .no-personas i {
+           font-size: 48px;
+           color: #cbd5e1;
+           margin-bottom: 16px;
+         }
+         
+         .no-personas p {
+           margin: 8px 0;
+           font-size: 14px;
+         }
+         
          .brief-container {
            position: relative;
          }
@@ -2246,7 +2353,7 @@ const Dashboard: React.FC = () => {
               
               {activeSection === 'concepto-creativo' && (
                 <div className="concepto-creativo-page">
-                  <div className="page-header">
+                  <div className="page-header compact">
                     <h1 className="page-title">
                       <i className="fas fa-lightbulb"></i>
                       Concepto Creativo
@@ -2257,121 +2364,146 @@ const Dashboard: React.FC = () => {
                   </div>
                   
                   <div className="page-content">
-                    <div className="concepto-form">
-                      {/* Selector de Organización */}
-                      <div className="form-section">
-                        <h3 className="section-title">
+                    <div className="concepto-form-compact">
+                      {/* Selector de Organización - Compacto */}
+                      <div className="form-section-compact">
+                        <h3 className="section-title-compact">
                           <i className="fas fa-building"></i>
-                          Seleccionar Organización
+                          Organización
                         </h3>
-                        <div className="organization-selector">
-                          <select 
-                            value={conceptoCreativo.organizacion}
-                            onChange={(e) => handleOrganizacionChange(e.target.value)}
-                            className="form-select"
-                          >
-                            <option value="">Selecciona una organización...</option>
-                            {organizations.map((org) => (
-                              <option key={org.id} value={org.id}>
-                                {org.name}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
+                        <select 
+                          value={conceptoCreativo.organizacion}
+                          onChange={(e) => handleOrganizacionChange(e.target.value)}
+                          className="form-select-compact"
+                        >
+                          <option value="">Selecciona una organización...</option>
+                          {organizations.map((org) => (
+                            <option key={org.id} value={org.id}>
+                              {org.name}
+                            </option>
+                          ))}
+                        </select>
                       </div>
 
-                      {/* Selector de Productos */}
+                      {/* Layout de dos columnas para productos y personas */}
                       {conceptoCreativo.organizacion && (
-                        <div className="form-section">
-                          <h3 className="section-title">
-                            <i className="fas fa-box"></i>
-                            Productos/Servicios
-                          </h3>
-                          <div className="products-grid">
-                            {products.length === 0 ? (
-                              <div className="no-products">
-                                <i className="fas fa-info-circle"></i>
-                                <p>No hay productos disponibles para esta organización.</p>
-                                <p>Crea productos desde la sección de Organizaciones.</p>
-                              </div>
-                            ) : (
-                              products.map((product) => (
-                                <div 
-                                  key={product.id} 
-                                  className={`product-card ${
-                                    conceptoCreativo.productos.includes(product.id) ? 'selected' : ''
-                                  }`}
-                                  onClick={() => handleProductoToggle(product.id)}
-                                >
-                                  <div className="product-header">
-                                    <h4 className="product-name">{product.name}</h4>
-                                    <div className="product-checkbox">
+                        <div className="two-column-layout">
+                          {/* Columna izquierda - Productos */}
+                          <div className="form-section-compact">
+                            <h3 className="section-title-compact">
+                              <i className="fas fa-box"></i>
+                              Productos ({products.length})
+                            </h3>
+                            <div className="products-grid-compact">
+                              {products.length === 0 ? (
+                                <div className="no-items-compact">
+                                  <i className="fas fa-info-circle"></i>
+                                  <span>No hay productos disponibles</span>
+                                </div>
+                              ) : (
+                                products.map((product) => (
+                                  <div 
+                                    key={product.id} 
+                                    className={`item-card-compact ${
+                                      conceptoCreativo.productos.includes(product.id) ? 'selected' : ''
+                                    }`}
+                                    onClick={() => handleProductoToggle(product.id)}
+                                  >
+                                    <div className="item-header-compact">
+                                      <span className="item-name">{product.name}</span>
                                       <input 
                                         type="checkbox" 
                                         checked={conceptoCreativo.productos.includes(product.id)}
                                         onChange={() => handleProductoToggle(product.id)}
                                       />
                                     </div>
+                                    <div className="item-details-compact">
+                                      <span className="item-category">{product.category}</span>
+                                      <span className="item-price">
+                                        {product.currency} {product.price?.toLocaleString()}
+                                      </span>
+                                    </div>
                                   </div>
-                                  <p className="product-description">{product.description}</p>
-                                  <div className="product-details">
-                                    <span className="product-category">{product.category}</span>
-                                    <span className="product-price">
-                                      {product.currency} {product.price?.toLocaleString()}
-                                    </span>
-                                  </div>
+                                ))
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Columna derecha - Buyer Personas */}
+                          <div className="form-section-compact">
+                            <h3 className="section-title-compact">
+                              <i className="fas fa-users"></i>
+                              Buyer Personas ({conceptoBuyerPersonas.length})
+                            </h3>
+                            <div className="personas-grid-compact">
+                              {conceptoBuyerPersonas.length === 0 ? (
+                                <div className="no-items-compact">
+                                  <i className="fas fa-info-circle"></i>
+                                  <span>No hay buyer personas disponibles</span>
                                 </div>
-                              ))
-                            )}
+                              ) : (
+                                conceptoBuyerPersonas.map((persona) => (
+                                  <div key={persona.id} className="item-card-compact persona">
+                                    <div className="item-header-compact">
+                                      <span className="item-name">{persona.name}</span>
+                                    </div>
+                                    <div className="persona-info-compact">
+                                      <span><i className="fas fa-birthday-cake"></i> {persona.age_range}</span>
+                                      <span><i className="fas fa-briefcase"></i> {persona.occupation}</span>
+                                      <span><i className="fas fa-map-marker-alt"></i> {persona.location}</span>
+                                    </div>
+                                  </div>
+                                ))
+                              )}
+                            </div>
                           </div>
                         </div>
                       )}
 
-                      {/* Brief de Campaña */}
-                      <div className="form-section">
-                        <h3 className="section-title">
+                      {/* Brief de Campaña - Compacto */}
+                      <div className="form-section-compact">
+                        <h3 className="section-title-compact">
                           <i className="fas fa-file-alt"></i>
-                          Brief de Campaña <span className="optional">(Opcional)</span>
+                          Brief de Campaña
+                          <span className="optional">(Opcional)</span>
                         </h3>
-                        <div className="brief-container">
+                        <div className="brief-container-compact">
                           <textarea
                             value={conceptoCreativo.brief}
                             onChange={(e) => handleBriefChange(e.target.value)}
-                            placeholder="Describe los objetivos, público objetivo, mensaje clave, tono de comunicación y cualquier información relevante para el concepto creativo..."
-                            className="brief-textarea"
-                            rows={8}
+                            placeholder="Describe los objetivos, público objetivo, mensaje clave y tono de comunicación..."
+                            className="brief-textarea-compact"
+                            rows={4}
                           />
-                          <div className="brief-counter">
+                          <div className="brief-counter-compact">
                             {conceptoCreativo.brief.length} caracteres
                           </div>
                         </div>
                       </div>
 
-                      {/* Resumen del Concepto */}
+                      {/* Resumen del Concepto - Compacto */}
                       {(conceptoCreativo.organizacion || conceptoCreativo.productos.length > 0 || conceptoCreativo.brief) && (
-                        <div className="form-section">
-                          <h3 className="section-title">
+                        <div className="form-section-compact summary">
+                          <h3 className="section-title-compact">
                             <i className="fas fa-eye"></i>
-                            Resumen del Concepto
+                            Resumen
                           </h3>
-                          <div className="concepto-summary">
+                          <div className="concepto-summary-compact">
                             {conceptoCreativo.organizacion && (
-                              <div className="summary-item">
+                              <div className="summary-row">
                                 <strong>Organización:</strong>
-                                <span>
-                                  {organizations.find(org => org.id === conceptoCreativo.organizacion)?.name}
-                                </span>
+                                <span>{organizations.find(org => org.id === conceptoCreativo.organizacion)?.name}</span>
                               </div>
                             )}
                             
                             {conceptoCreativo.productos.length > 0 && (
-                              <div className="summary-item">
-                                <strong>Productos seleccionados ({conceptoCreativo.productos.length}):</strong>
-                                <div className="selected-products">
+                              <div className="summary-row">
+                                <strong>Productos ({conceptoCreativo.productos.length}):</strong>
+                                <div className="selected-items">
                                   {conceptoCreativo.productos.map(prodId => {
                                     const product = products.find(p => p.id === prodId);
                                     return product ? (
-                                      <span key={prodId} className="product-tag">
+                                      <span key={prodId} className="item-tag">
                                         {product.name}
                                       </span>
                                     ) : null;
@@ -2381,11 +2513,11 @@ const Dashboard: React.FC = () => {
                             )}
                             
                             {conceptoCreativo.brief && (
-                              <div className="summary-item">
+                              <div className="summary-row">
                                 <strong>Brief:</strong>
-                                <p className="brief-preview">
-                                  {conceptoCreativo.brief.length > 200 
-                                    ? `${conceptoCreativo.brief.substring(0, 200)}...` 
+                                <p className="brief-preview-compact">
+                                  {conceptoCreativo.brief.length > 150 
+                                    ? `${conceptoCreativo.brief.substring(0, 150)}...` 
                                     : conceptoCreativo.brief
                                   }
                                 </p>

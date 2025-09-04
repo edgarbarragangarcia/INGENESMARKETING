@@ -1,16 +1,110 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Dashboard from '@/components/Dashboard';
+import { authService, AuthUser } from '@/lib/supabase';
 
 function LandingPage() {
   const [showLoginModal, setShowLoginModal] = useState(false);
+
+  // Escuchar cambios de autenticación
+  useEffect(() => {
+    const { data: { subscription } } = authService.onAuthStateChange((user) => {
+      if (user && window.location.hash === '') {
+        // Si el usuario se autentica y está en la página principal, ir al dashboard
+        const userData = JSON.stringify({
+          id: user.id,
+          email: user.email,
+          name: user.user_metadata?.name || 'Usuario',
+          role: 'Usuario'
+        });
+        
+        localStorage.setItem('userToken', user.id);
+        localStorage.setItem('userData', userData);
+        window.location.hash = 'dashboard';
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleLoginClick = () => {
     setShowLoginModal(true);
   };
 
-  const handleDashboardAccess = () => {
-    window.location.hash = 'dashboard';
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+    
+    if (email && password) {
+      try {
+        const { user, error } = await authService.signIn(email, password);
+        
+        if (error) {
+          alert('Error de autenticación: ' + error.message);
+          return;
+        }
+        
+        if (user) {
+          // Guardar datos del usuario en localStorage
+          const userData = JSON.stringify({
+            id: user.id,
+            email: user.email,
+            name: user.user_metadata?.name || 'Usuario',
+            role: 'Usuario'
+          });
+          
+          localStorage.setItem('userToken', user.id);
+          localStorage.setItem('userData', userData);
+          
+          // Cerrar modal y ir al dashboard
+          setShowLoginModal(false);
+          window.location.hash = 'dashboard';
+        }
+      } catch (error) {
+        console.error('Error en login:', error);
+        alert('Error de conexión. Intenta nuevamente.');
+      }
+    }
+  };
+
+  const handleDashboardAccess = async () => {
+    // Verificar si hay una sesión activa en Supabase
+    const currentUser = await authService.getCurrentUser();
+    
+    if (currentUser) {
+      // Si hay sesión activa, actualizar localStorage y ir al dashboard
+      const userData = JSON.stringify({
+        id: currentUser.id,
+        email: currentUser.email,
+        name: currentUser.user_metadata?.name || 'Usuario',
+        role: 'Usuario'
+      });
+      
+      localStorage.setItem('userToken', currentUser.id);
+      localStorage.setItem('userData', userData);
+      window.location.hash = 'dashboard';
+    } else {
+      // Si no hay sesión, mostrar modal de login
+      setShowLoginModal(true);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      const { error } = await authService.signInWithGoogle();
+      
+      if (error) {
+        console.error('Error en Google login:', error);
+        alert('Error al iniciar sesión con Google: ' + error.message);
+      }
+      // El redirect se maneja automáticamente por Supabase
+    } catch (error) {
+      console.error('Error en Google login:', error);
+      alert('Error de conexión. Intenta nuevamente.');
+    }
   };
 
   return (
@@ -840,8 +934,8 @@ function LandingPage() {
         .modal-content {
           background: white;
           border-radius: var(--border-radius);
-          padding: 2rem;
-          max-width: 400px;
+          padding: 1.5rem;
+          max-width: 350px;
           width: 90%;
           position: relative;
           box-shadow: var(--shadow-xl);
@@ -858,46 +952,64 @@ function LandingPage() {
         
         .modal-header {
           text-align: center;
-          margin-bottom: 2rem;
+          margin-bottom: 1.5rem;
         }
         
         .modal-header h2 {
-          font-size: 1.5rem;
+          font-size: 1.25rem;
           font-weight: 600;
-          margin-bottom: 0.5rem;
+          margin-bottom: 0.25rem;
           color: var(--text-primary);
         }
         
+        .modal-header p {
+          font-size: 0.875rem;
+          color: var(--text-secondary);
+          margin: 0;
+        }
+        
         .form-group {
-          margin-bottom: 1rem;
+          margin-bottom: 0.875rem;
         }
         
         .form-group label {
           display: block;
-          margin-bottom: 0.5rem;
+          margin-bottom: 0.375rem;
           font-weight: 500;
+          font-size: 0.875rem;
           color: var(--text-primary);
         }
         
         .form-group input {
           width: 100%;
-          padding: 0.75rem;
+          padding: 0.625rem;
           border: 1px solid var(--border-color);
           border-radius: var(--border-radius);
-          font-size: 1rem;
+          font-size: 0.875rem;
+          box-sizing: border-box;
         }
         
         .form-actions {
           display: flex;
-          gap: 1rem;
+          flex-direction: column;
+          gap: 0.75rem;
           margin-bottom: 1rem;
+        }
+        
+        .form-actions .btn-primary,
+        .form-actions .btn-secondary {
+          padding: 0.625rem 1rem;
+          font-size: 0.875rem;
+          font-weight: 500;
+          justify-content: center;
         }
         
         .divider {
           text-align: center;
-          margin: 1.5rem 0;
+          margin: 1rem 0;
           position: relative;
           color: var(--text-secondary);
+          font-size: 0.875rem;
         }
         
         .divider::before {
@@ -917,12 +1029,13 @@ function LandingPage() {
         
         .btn-google {
           width: 100%;
-          padding: 0.75rem;
+          padding: 0.625rem;
           border: 1px solid var(--border-color);
           background: white;
           color: var(--text-primary);
           border-radius: var(--border-radius);
           font-weight: 500;
+          font-size: 0.875rem;
           cursor: pointer;
           transition: var(--transition);
           display: flex;
@@ -1266,7 +1379,7 @@ function LandingPage() {
               </div>
               <div className="modal-body">
                 <div className="supabase-login">
-                  <form>
+                  <form onSubmit={handleLogin}>
                     <div className="form-group">
                       <label htmlFor="email">Email:</label>
                       <input type="email" id="email" name="email" required />
@@ -1276,14 +1389,14 @@ function LandingPage() {
                       <input type="password" id="password" name="password" required />
                     </div>
                     <div className="form-actions">
-                      <button type="submit" className="btn-primary" onClick={handleDashboardAccess}>Iniciar Sesión</button>
+                      <button type="submit" className="btn-primary">Iniciar Sesión</button>
                       <button type="button" className="btn-secondary">Registrarse</button>
                     </div>
                   </form>
                   <div className="divider">
                     <span>o continúa con</span>
                   </div>
-                  <button className="btn-google" onClick={handleDashboardAccess}>
+                  <button className="btn-google" onClick={handleGoogleLogin}>
                     <i className="fab fa-google"></i>
                     Continuar con Google
                   </button>

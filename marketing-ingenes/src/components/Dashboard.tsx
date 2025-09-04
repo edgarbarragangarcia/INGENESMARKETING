@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { authService } from '@/lib/supabase';
 
 const Dashboard: React.FC = () => {
   const [activeSection, setActiveSection] = useState('dashboard');
@@ -40,18 +41,36 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handleLogout = () => {
-    // Limpiar datos de sesión
-    localStorage.removeItem('userToken');
-    localStorage.removeItem('userData');
-    sessionStorage.clear();
-    
-    // Cerrar el menú
-    setIsUserMenuOpen(false);
-    
-    // Redirigir a la landing page removiendo el hash
-    window.location.hash = '';
-    window.location.reload();
+  const handleLogout = async () => {
+    try {
+      // Cerrar sesión en Supabase
+      const { error } = await authService.signOut();
+      
+      if (error) {
+        console.error('Error al cerrar sesión:', error);
+      }
+      
+      // Limpiar datos de sesión local
+      localStorage.removeItem('userToken');
+      localStorage.removeItem('userData');
+      sessionStorage.clear();
+      
+      // Cerrar menú de usuario
+      setIsUserMenuOpen(false);
+      
+      // Redirigir a la página principal
+      window.location.hash = '';
+      window.location.reload();
+    } catch (error) {
+      console.error('Error en logout:', error);
+      // Aún así limpiar datos locales y redirigir
+      localStorage.removeItem('userToken');
+      localStorage.removeItem('userData');
+      sessionStorage.clear();
+      setIsUserMenuOpen(false);
+      window.location.hash = '';
+      window.location.reload();
+    }
   };
 
   useEffect(() => {

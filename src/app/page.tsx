@@ -9,9 +9,8 @@ function LandingPage() {
   // Escuchar cambios de autenticación
   useEffect(() => {
     const { data: { subscription } } = authService.onAuthStateChange((user) => {
-      const hash = window.location.hash;
-      if (user && (hash === '' || hash.startsWith('#dashboard'))) {
-        // Si el usuario se autentica, ir al dashboard
+      if (user) {
+        // Si el usuario se autentica exitosamente, guardar datos y redirigir a la raíz
         const userData = JSON.stringify({
           id: user.id,
           email: user.email,
@@ -22,8 +21,8 @@ function LandingPage() {
         localStorage.setItem('userToken', user.id);
         localStorage.setItem('userData', userData);
         
-        // Limpiar la URL y redirigir al dashboard
-        window.history.replaceState(null, '', window.location.pathname + '#dashboard');
+        // Redirigir a la raíz después del login exitoso
+        window.history.replaceState(null, '', window.location.pathname);
       }
     });
 
@@ -1426,18 +1425,24 @@ export default function Home() {
         // Verificar si hay una sesión activa
         const currentUser = await authService.getCurrentUser();
         
-        // Verificar el hash de la URL (incluyendo parámetros de autenticación)
+        // Verificar el hash de la URL
         const hash = window.location.hash;
-        const isDashboardHash = hash === '#dashboard' || hash.startsWith('#dashboard');
+        const validDashboardHashes = ['#dashboard', '#organizaciones', '#concepto-creativo', '#pacientes'];
+        const isDashboardRoute = validDashboardHashes.some(validHash => hash === validHash || hash.startsWith(validHash));
         
-        // Si hay usuario logueado y está en dashboard, o si hay hash de dashboard
-        if ((currentUser && isDashboardHash) || isDashboardHash) {
+        // Solo mostrar dashboard si hay un hash válido Y el usuario está autenticado
+        if (isDashboardRoute && currentUser) {
           setShowDashboard(true);
           // Limpiar la URL de parámetros de autenticación si existen
           if (hash.includes('#access_token=') || hash.includes('&')) {
             window.history.replaceState(null, '', window.location.pathname + '#dashboard');
           }
+        } else if (isDashboardRoute && !currentUser) {
+          // Si intenta acceder al dashboard sin estar autenticado, redirigir a la landing
+          window.history.replaceState(null, '', window.location.pathname);
+          setShowDashboard(false);
         } else {
+          // Para la raíz (/) siempre mostrar landing page
           setShowDashboard(false);
         }
       } catch (error) {
@@ -1450,11 +1455,28 @@ export default function Home() {
 
     const checkHash = () => {
       const hash = window.location.hash;
-      const isDashboardHash = hash === '#dashboard' || hash.startsWith('#dashboard');
-      setShowDashboard(isDashboardHash);
+      const validDashboardHashes = ['#dashboard', '#organizaciones', '#concepto-creativo', '#pacientes'];
+      const isDashboardRoute = validDashboardHashes.some(validHash => hash === validHash || hash.startsWith(validHash));
+      
+      // Solo mostrar dashboard si hay hash válido
+      if (isDashboardRoute) {
+        // Verificar autenticación antes de mostrar dashboard
+        authService.getCurrentUser().then(currentUser => {
+          if (currentUser) {
+            setShowDashboard(true);
+          } else {
+            // Si no está autenticado, redirigir a landing
+            window.history.replaceState(null, '', window.location.pathname);
+            setShowDashboard(false);
+          }
+        });
+      } else {
+        // Para cualquier otra ruta (incluyendo raíz), mostrar landing
+        setShowDashboard(false);
+      }
       
       // Limpiar la URL de parámetros de autenticación si existen
-      if (isDashboardHash && (hash.includes('#access_token=') || hash.includes('&'))) {
+      if (isDashboardRoute && (hash.includes('#access_token=') || hash.includes('&'))) {
         window.history.replaceState(null, '', window.location.pathname + '#dashboard');
       }
     };

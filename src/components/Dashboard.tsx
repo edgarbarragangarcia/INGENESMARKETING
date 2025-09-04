@@ -16,6 +16,24 @@ interface Organization {
   created_at: string;
 }
 
+interface Product {
+  id: string;
+  organization_id: string;
+  name: string;
+  description: string;
+  category: string;
+  price: number;
+  currency: string;
+  status: string;
+  created_at: string;
+}
+
+interface ConceptoCreativo {
+  organizacion: string;
+  productos: string[];
+  brief: string;
+}
+
 interface OrganizationFormData {
   name: string;
   mission: string;
@@ -47,17 +65,36 @@ interface OrganizationFormData {
 }
 
 const Dashboard: React.FC = () => {
-  const [activeSection, setActiveSection] = useState('dashboard');
+  // Inicializar activeSection basado en el hash de la URL
+  const getInitialSection = () => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash.replace('#', '');
+      if (hash && ['dashboard', 'organizaciones', 'concepto-creativo', 'pacientes'].includes(hash)) {
+        return hash;
+      }
+      return localStorage.getItem('activeSection') || 'dashboard';
+    }
+    return 'dashboard';
+  };
+  
+  const [activeSection, setActiveSection] = useState(getInitialSection);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isOrganizationModalOpen, setIsOrganizationModalOpen] = useState(false);
   const [organizations, setOrganizations] = useState<Organization[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingOrganization, setEditingOrganization] = useState<Organization | null>(null);
+  const [conceptoCreativo, setConceptoCreativo] = useState<ConceptoCreativo>({
+    organizacion: '',
+    productos: [],
+    brief: ''
+  });
 
   const handleNavClick = (section: string) => {
     setActiveSection(section);
     localStorage.setItem('activeSection', section);
+    window.location.hash = section;
     setIsMobileMenuOpen(false);
   };
 
@@ -239,6 +276,56 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const loadProducts = async (organizationId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('organization_id', organizationId)
+        .eq('status', 'active')
+        .order('name', { ascending: true });
+
+      if (error) {
+        console.error('Error al cargar productos:', error);
+        return;
+      }
+
+      setProducts(data || []);
+    } catch (error) {
+      console.error('Error al cargar productos:', error);
+    }
+  };
+
+  const handleOrganizacionChange = (organizacionId: string) => {
+    setConceptoCreativo(prev => ({
+      ...prev,
+      organizacion: organizacionId,
+      productos: [] // Reset productos cuando cambia la organización
+    }));
+    
+    if (organizacionId) {
+      loadProducts(organizacionId);
+    } else {
+      setProducts([]);
+    }
+  };
+
+  const handleProductoToggle = (productoId: string) => {
+    setConceptoCreativo(prev => ({
+      ...prev,
+      productos: prev.productos.includes(productoId)
+        ? prev.productos.filter(id => id !== productoId)
+        : [...prev.productos, productoId]
+    }));
+  };
+
+  const handleBriefChange = (brief: string) => {
+    setConceptoCreativo(prev => ({
+      ...prev,
+      brief
+    }));
+  };
+
   const handleLogout = async () => {
     try {
       // Cerrar sesión en Supabase
@@ -272,10 +359,29 @@ const Dashboard: React.FC = () => {
   };
 
   useEffect(() => {
-    // Restaurar la sección activa desde localStorage
-    const savedSection = localStorage.getItem('activeSection') || 'dashboard';
-    setActiveSection(savedSection);
-  }, []);
+    // Función para manejar cambios de hash en la URL
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '');
+      if (hash && ['dashboard', 'organizaciones', 'concepto-creativo', 'pacientes'].includes(hash)) {
+        setActiveSection(hash);
+        localStorage.setItem('activeSection', hash);
+      }
+    };
+
+    // Sincronizar el hash inicial con el estado si es necesario
+    const currentHash = window.location.hash.replace('#', '');
+    if (!currentHash || !['dashboard', 'organizaciones', 'concepto-creativo', 'pacientes'].includes(currentHash)) {
+      window.location.hash = activeSection;
+    }
+
+    // Escuchar cambios de hash
+    window.addEventListener('hashchange', handleHashChange);
+
+    // Cleanup
+    return () => {
+       window.removeEventListener('hashchange', handleHashChange);
+     };
+   }, [activeSection]);
 
   return (
     <>
@@ -1227,7 +1333,6 @@ const Dashboard: React.FC = () => {
          @media (max-width: 768px) {
            .page-header {
              flex-direction: column;
-             gap: 16px;
              align-items: flex-start;
            }
            
@@ -1259,6 +1364,286 @@ const Dashboard: React.FC = () => {
              content: attr(data-label);
              font-weight: 600;
              color: #1e293b;
+           }
+         }
+         
+         /* Concepto Creativo Page Styles */
+         .concepto-creativo-page {
+           animation: fadeIn 0.5s ease-out;
+         }
+         
+         .page-description {
+           font-size: 14px;
+           color: #64748b;
+           margin: 8px 0 0 0;
+           font-weight: 400;
+         }
+         
+         .concepto-form {
+           display: flex;
+           flex-direction: column;
+           gap: 32px;
+         }
+         
+         .form-section {
+           background: rgba(255, 255, 255, 0.8);
+           border-radius: 16px;
+           padding: 24px;
+           border: 1px solid rgba(59, 130, 246, 0.1);
+           box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+         }
+         
+         .section-title {
+           font-size: 18px;
+           font-weight: 700;
+           color: #1e293b;
+           display: flex;
+           align-items: center;
+           gap: 12px;
+           margin: 0 0 20px 0;
+         }
+         
+         .section-title i {
+           color: #3b82f6;
+           font-size: 16px;
+         }
+         
+         .optional {
+           font-size: 12px;
+           color: #64748b;
+           font-weight: 400;
+         }
+         
+         .organization-selector {
+           width: 100%;
+         }
+         
+         .form-select {
+           width: 100%;
+           padding: 12px 16px;
+           border: 2px solid rgba(59, 130, 246, 0.1);
+           border-radius: 12px;
+           font-size: 14px;
+           background: rgba(255, 255, 255, 0.9);
+           color: #1e293b;
+           transition: all 0.3s ease;
+           cursor: pointer;
+         }
+         
+         .form-select:focus {
+           outline: none;
+           border-color: #3b82f6;
+           box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+         }
+         
+         .products-grid {
+           display: grid;
+           grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+           gap: 16px;
+         }
+         
+         .product-card {
+           background: rgba(255, 255, 255, 0.9);
+           border: 2px solid rgba(59, 130, 246, 0.1);
+           border-radius: 12px;
+           padding: 20px;
+           cursor: pointer;
+           transition: all 0.3s ease;
+           position: relative;
+         }
+         
+         .product-card:hover {
+           border-color: #3b82f6;
+           box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
+           transform: translateY(-2px);
+         }
+         
+         .product-card.selected {
+           border-color: #3b82f6;
+           background: rgba(59, 130, 246, 0.05);
+           box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2);
+         }
+         
+         .product-header {
+           display: flex;
+           justify-content: space-between;
+           align-items: flex-start;
+           margin-bottom: 12px;
+         }
+         
+         .product-name {
+           font-size: 16px;
+           font-weight: 600;
+           color: #1e293b;
+           margin: 0;
+           flex: 1;
+         }
+         
+         .product-checkbox {
+           margin-left: 12px;
+         }
+         
+         .product-checkbox input[type="checkbox"] {
+           width: 18px;
+           height: 18px;
+           accent-color: #3b82f6;
+           cursor: pointer;
+         }
+         
+         .product-description {
+           font-size: 14px;
+           color: #64748b;
+           margin: 0 0 16px 0;
+           line-height: 1.5;
+         }
+         
+         .product-details {
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+           gap: 12px;
+         }
+         
+         .product-category {
+           padding: 4px 12px;
+           background: rgba(59, 130, 246, 0.1);
+           color: #3b82f6;
+           border-radius: 20px;
+           font-size: 12px;
+           font-weight: 600;
+         }
+         
+         .product-price {
+           font-size: 14px;
+           font-weight: 700;
+           color: #1e293b;
+         }
+         
+         .no-products {
+           text-align: center;
+           padding: 40px 20px;
+           color: #64748b;
+         }
+         
+         .no-products i {
+           font-size: 48px;
+           color: #cbd5e1;
+           margin-bottom: 16px;
+         }
+         
+         .no-products p {
+           margin: 8px 0;
+           font-size: 14px;
+         }
+         
+         .brief-container {
+           position: relative;
+         }
+         
+         .brief-textarea {
+           width: 100%;
+           padding: 16px;
+           border: 2px solid rgba(59, 130, 246, 0.1);
+           border-radius: 12px;
+           font-size: 14px;
+           background: rgba(255, 255, 255, 0.9);
+           color: #1e293b;
+           resize: vertical;
+           min-height: 120px;
+           font-family: inherit;
+           line-height: 1.5;
+           transition: all 0.3s ease;
+         }
+         
+         .brief-textarea:focus {
+           outline: none;
+           border-color: #3b82f6;
+           box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+         }
+         
+         .brief-textarea::placeholder {
+           color: #94a3b8;
+         }
+         
+         .brief-counter {
+           position: absolute;
+           bottom: 8px;
+           right: 12px;
+           font-size: 12px;
+           color: #64748b;
+           background: rgba(255, 255, 255, 0.9);
+           padding: 4px 8px;
+           border-radius: 6px;
+         }
+         
+         .concepto-summary {
+           background: rgba(59, 130, 246, 0.05);
+           border: 1px solid rgba(59, 130, 246, 0.1);
+           border-radius: 12px;
+           padding: 20px;
+         }
+         
+         .summary-item {
+           margin-bottom: 16px;
+         }
+         
+         .summary-item:last-child {
+           margin-bottom: 0;
+         }
+         
+         .summary-item strong {
+           display: block;
+           font-size: 14px;
+           font-weight: 600;
+           color: #1e293b;
+           margin-bottom: 8px;
+         }
+         
+         .summary-item span {
+           font-size: 14px;
+           color: #475569;
+         }
+         
+         .selected-products {
+           display: flex;
+           flex-wrap: wrap;
+           gap: 8px;
+           margin-top: 8px;
+         }
+         
+         .product-tag {
+           padding: 6px 12px;
+           background: #3b82f6;
+           color: white;
+           border-radius: 20px;
+           font-size: 12px;
+           font-weight: 500;
+         }
+         
+         .brief-preview {
+           font-size: 14px;
+           color: #475569;
+           line-height: 1.6;
+           margin: 8px 0 0 0;
+           padding: 12px;
+           background: rgba(255, 255, 255, 0.7);
+           border-radius: 8px;
+           border-left: 4px solid #3b82f6;
+         }
+         
+         @media (max-width: 768px) {
+           .products-grid {
+             grid-template-columns: 1fr;
+           }
+           
+           .product-details {
+             flex-direction: column;
+             align-items: flex-start;
+             gap: 8px;
+           }
+           
+           .selected-products {
+             flex-direction: column;
            }
          }
        `}</style>
@@ -1297,12 +1682,12 @@ const Dashboard: React.FC = () => {
                 <span>Organizaciones</span>
               </a>
               <a 
-                href="#analytics" 
-                data-section="analytics" 
-                className={`nav-link ${activeSection === 'analytics' ? 'active' : ''}`}
-                onClick={() => handleNavClick('analytics')}
+                href="#concepto-creativo" 
+                data-section="concepto-creativo" 
+                className={`nav-link ${activeSection === 'concepto-creativo' ? 'active' : ''}`}
+                onClick={() => handleNavClick('concepto-creativo')}
               >
-                <i className="fas fa-chart-bar"></i>
+                <i className="fas fa-lightbulb"></i>
                 <span>Concepto Creativo</span>
               </a>
               <a 
@@ -1621,6 +2006,161 @@ const Dashboard: React.FC = () => {
                           ))
                         )}
                       </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {activeSection === 'concepto-creativo' && (
+                <div className="concepto-creativo-page">
+                  <div className="page-header">
+                    <h1 className="page-title">
+                      <i className="fas fa-lightbulb"></i>
+                      Concepto Creativo
+                    </h1>
+                    <p className="page-description">
+                      Crea conceptos creativos seleccionando una organización, sus productos y agregando un brief de campaña.
+                    </p>
+                  </div>
+                  
+                  <div className="page-content">
+                    <div className="concepto-form">
+                      {/* Selector de Organización */}
+                      <div className="form-section">
+                        <h3 className="section-title">
+                          <i className="fas fa-building"></i>
+                          Seleccionar Organización
+                        </h3>
+                        <div className="organization-selector">
+                          <select 
+                            value={conceptoCreativo.organizacion}
+                            onChange={(e) => handleOrganizacionChange(e.target.value)}
+                            className="form-select"
+                          >
+                            <option value="">Selecciona una organización...</option>
+                            {organizations.map((org) => (
+                              <option key={org.id} value={org.id}>
+                                {org.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* Selector de Productos */}
+                      {conceptoCreativo.organizacion && (
+                        <div className="form-section">
+                          <h3 className="section-title">
+                            <i className="fas fa-box"></i>
+                            Productos/Servicios
+                          </h3>
+                          <div className="products-grid">
+                            {products.length === 0 ? (
+                              <div className="no-products">
+                                <i className="fas fa-info-circle"></i>
+                                <p>No hay productos disponibles para esta organización.</p>
+                                <p>Crea productos desde la sección de Organizaciones.</p>
+                              </div>
+                            ) : (
+                              products.map((product) => (
+                                <div 
+                                  key={product.id} 
+                                  className={`product-card ${
+                                    conceptoCreativo.productos.includes(product.id) ? 'selected' : ''
+                                  }`}
+                                  onClick={() => handleProductoToggle(product.id)}
+                                >
+                                  <div className="product-header">
+                                    <h4 className="product-name">{product.name}</h4>
+                                    <div className="product-checkbox">
+                                      <input 
+                                        type="checkbox" 
+                                        checked={conceptoCreativo.productos.includes(product.id)}
+                                        onChange={() => handleProductoToggle(product.id)}
+                                      />
+                                    </div>
+                                  </div>
+                                  <p className="product-description">{product.description}</p>
+                                  <div className="product-details">
+                                    <span className="product-category">{product.category}</span>
+                                    <span className="product-price">
+                                      {product.currency} {product.price?.toLocaleString()}
+                                    </span>
+                                  </div>
+                                </div>
+                              ))
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Brief de Campaña */}
+                      <div className="form-section">
+                        <h3 className="section-title">
+                          <i className="fas fa-file-alt"></i>
+                          Brief de Campaña <span className="optional">(Opcional)</span>
+                        </h3>
+                        <div className="brief-container">
+                          <textarea
+                            value={conceptoCreativo.brief}
+                            onChange={(e) => handleBriefChange(e.target.value)}
+                            placeholder="Describe los objetivos, público objetivo, mensaje clave, tono de comunicación y cualquier información relevante para el concepto creativo..."
+                            className="brief-textarea"
+                            rows={8}
+                          />
+                          <div className="brief-counter">
+                            {conceptoCreativo.brief.length} caracteres
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Resumen del Concepto */}
+                      {(conceptoCreativo.organizacion || conceptoCreativo.productos.length > 0 || conceptoCreativo.brief) && (
+                        <div className="form-section">
+                          <h3 className="section-title">
+                            <i className="fas fa-eye"></i>
+                            Resumen del Concepto
+                          </h3>
+                          <div className="concepto-summary">
+                            {conceptoCreativo.organizacion && (
+                              <div className="summary-item">
+                                <strong>Organización:</strong>
+                                <span>
+                                  {organizations.find(org => org.id === conceptoCreativo.organizacion)?.name}
+                                </span>
+                              </div>
+                            )}
+                            
+                            {conceptoCreativo.productos.length > 0 && (
+                              <div className="summary-item">
+                                <strong>Productos seleccionados ({conceptoCreativo.productos.length}):</strong>
+                                <div className="selected-products">
+                                  {conceptoCreativo.productos.map(prodId => {
+                                    const product = products.find(p => p.id === prodId);
+                                    return product ? (
+                                      <span key={prodId} className="product-tag">
+                                        {product.name}
+                                      </span>
+                                    ) : null;
+                                  })}
+                                </div>
+                              </div>
+                            )}
+                            
+                            {conceptoCreativo.brief && (
+                              <div className="summary-item">
+                                <strong>Brief:</strong>
+                                <p className="brief-preview">
+                                  {conceptoCreativo.brief.length > 200 
+                                    ? `${conceptoCreativo.brief.substring(0, 200)}...` 
+                                    : conceptoCreativo.brief
+                                  }
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

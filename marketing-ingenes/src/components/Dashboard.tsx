@@ -1,11 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Dashboard.css';
 
 const Dashboard: React.FC = () => {
   const [activeSection, setActiveSection] = useState('dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [theme, setTheme] = useState('system');
 
   const handleNavClick = (section: string) => {
     setActiveSection(section);
@@ -15,6 +17,41 @@ const Dashboard: React.FC = () => {
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
+
+  const toggleUserMenu = () => {
+    setIsUserMenuOpen(!isUserMenuOpen);
+  };
+
+  const handleThemeChange = (newTheme: string) => {
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+    applyTheme(newTheme);
+  };
+
+  const applyTheme = (selectedTheme: string) => {
+    const root = document.documentElement;
+    if (selectedTheme === 'dark') {
+      root.setAttribute('data-theme', 'dark');
+    } else if (selectedTheme === 'light') {
+      root.setAttribute('data-theme', 'light');
+    } else {
+      // System theme
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      root.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+    }
+  };
+
+  const handleLogout = () => {
+    // Implementar lógica de logout aquí
+    console.log('Cerrando sesión...');
+    setIsUserMenuOpen(false);
+  };
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') || 'system';
+    setTheme(savedTheme);
+    applyTheme(savedTheme);
+  }, []);
 
   return (
     <div className="dashboard">
@@ -68,7 +105,55 @@ const Dashboard: React.FC = () => {
           </div>
 
           <div className="header-actions">
-            <div className="user-info">
+            <div className="user-avatar-container">
+              <div className="user-avatar" onClick={toggleUserMenu}>
+                <img 
+                  src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face" 
+                  alt="Usuario" 
+                  className="avatar-image"
+                />
+                <div className="user-info">
+                  <span className="user-name">Edgar Barragán</span>
+                  <span className="user-role">Administrador</span>
+                </div>
+                <i className={`fas fa-chevron-down dropdown-arrow ${isUserMenuOpen ? 'open' : ''}`}></i>
+              </div>
+              
+              {isUserMenuOpen && (
+                <div className="user-dropdown">
+                  <div className="dropdown-section">
+                    <h4>Tema</h4>
+                    <div className="theme-options">
+                      <button 
+                        className={`theme-btn ${theme === 'light' ? 'active' : ''}`}
+                        onClick={() => handleThemeChange('light')}
+                      >
+                        <i className="fas fa-sun"></i>
+                        Claro
+                      </button>
+                      <button 
+                        className={`theme-btn ${theme === 'dark' ? 'active' : ''}`}
+                        onClick={() => handleThemeChange('dark')}
+                      >
+                        <i className="fas fa-moon"></i>
+                        Oscuro
+                      </button>
+                      <button 
+                        className={`theme-btn ${theme === 'system' ? 'active' : ''}`}
+                        onClick={() => handleThemeChange('system')}
+                      >
+                        <i className="fas fa-desktop"></i>
+                        Sistema
+                      </button>
+                    </div>
+                  </div>
+                  <div className="dropdown-divider"></div>
+                  <button className="logout-btn" onClick={handleLogout}>
+                    <i className="fas fa-sign-out-alt"></i>
+                    Cerrar Sesión
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 

@@ -400,9 +400,9 @@ body::before {
 /* Main Content */
 .main-content {
     width: 100%;
-    max-width: 1200px;
+    max-width: 95vw;
     margin: 0 auto;
-    padding: 2rem;
+    padding: 1rem;
     background: rgba(255, 255, 255, 0.6);
     backdrop-filter: blur(40px);
     -webkit-backdrop-filter: blur(40px);

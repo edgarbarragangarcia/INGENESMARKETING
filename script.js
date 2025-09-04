@@ -189,12 +189,12 @@ function setupEventListeners() {
     });
     
     // Formulario de login tradicional
-    const loginForm = document.querySelector('.login-form');
+    const loginForm = document.getElementById('loginForm');
     if (loginForm) {
         loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            const email = loginForm.querySelector('input[type="email"]').value;
-            const password = loginForm.querySelector('input[type="password"]').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
             handleEmailLogin(email, password);
         });
     }

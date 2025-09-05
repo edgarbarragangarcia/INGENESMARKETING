@@ -136,6 +136,7 @@ const Dashboard: React.FC = () => {
   const [organizationPersonas, setOrganizationPersonas] = useState<BuyerPersona[]>([]);
   const [organizationProducts, setOrganizationProducts] = useState<ProductData[]>([]);
   const [conceptoBuyerPersonas, setConceptoBuyerPersonas] = useState<BuyerPersona[]>([]);
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
   // Función para manejar el envío del modal
   const handleModalSubmit = async (formData: OrganizationFormData) => {
@@ -345,8 +346,18 @@ const Dashboard: React.FC = () => {
   };
 
   useEffect(() => {
+    loadCurrentUser();
     loadOrganizations();
   }, []);
+
+  const loadCurrentUser = async () => {
+    try {
+      const user = await authService.getCurrentUser();
+      setCurrentUser(user);
+    } catch (error) {
+      console.error('Error al cargar usuario actual:', error);
+    }
+  };
 
   const handleEditOrganization = async (organization: Organization) => {
     setEditingOrganization(organization);
@@ -3386,15 +3397,15 @@ const Dashboard: React.FC = () => {
               <div className="user-avatar-container">
                 <div className="user-avatar" onClick={toggleUserMenu}>
                   <Image 
-                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face" 
-                    alt="Usuario" 
+                    src={currentUser?.user_metadata?.avatar_url || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face"} 
+                    alt={currentUser?.user_metadata?.name || "Usuario"} 
                     width={40}
                     height={40}
                     className="avatar-image"
                   />
                   <div className="user-info">
-                    <span className="user-name">Edgar Barragán</span>
-                    <span className="user-role">Administrador</span>
+                    <span className="user-name">{currentUser?.user_metadata?.name || "Usuario"}</span>
+                    <span className="user-role">{currentUser?.email || "Usuario"}</span>
                   </div>
                   <ChevronDownIcon size={12} className={`dropdown-arrow ${isUserMenuOpen ? 'open' : ''}`} />
                 </div>

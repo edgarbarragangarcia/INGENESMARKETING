@@ -58,6 +58,16 @@ const ConceptoCreativoPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [generatedConcept, setGeneratedConcept] = useState<string>('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [activeTab, setActiveTab] = useState<'create' | 'view'>('create');
+  const [createdConcepts, setCreatedConcepts] = useState<Array<{
+    id: string;
+    title: string;
+    organization: string;
+    products: string[];
+    brief: string;
+    concept: string;
+    createdAt: Date;
+  }>>([]);
 
   useEffect(() => {
     loadInitialData();
@@ -150,6 +160,29 @@ Basándonos en el análisis de mercado y perfiles de buyer personas, proponemos:
     }
   };
 
+  const handleSaveConcept = () => {
+    if (!generatedConcept) return;
+    
+    const organization = organizations.find(org => org.id === selectedOrganization);
+    const selectedProductsData = products.filter(product => selectedProducts.includes(product.id));
+    
+    const newConcept = {
+      id: Date.now().toString(),
+      title: `Concepto Creativo: ${organization?.name || 'Sin título'}`,
+      organization: organization?.name || '',
+      products: selectedProductsData.map(p => p.name),
+      brief,
+      concept: generatedConcept,
+      createdAt: new Date()
+    };
+    
+    setCreatedConcepts(prev => [newConcept, ...prev]);
+    setGeneratedConcept('');
+    setBrief('');
+    setSelectedProducts([]);
+    setSelectedOrganization('');
+  };
+
   const filteredProducts = selectedOrganization 
     ? products.filter(product => product.organization_id === selectedOrganization)
     : products;
@@ -200,98 +233,66 @@ Basándonos en el análisis de mercado y perfiles de buyer personas, proponemos:
           z-index: 100;
         }
         
-        .nav-container {
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 0 20px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
+        .tabbar {
+          background: white;
+          border-bottom: 1px solid #e5e7eb;
+          box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
         }
         
-        .nav-logo {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          font-weight: 700;
-          color: #3b82f6;
-          text-decoration: none;
-        }
-        
-        .logo-text {
-          display: flex;
-          flex-direction: column;
-          line-height: 1.2;
-        }
-        
-        .logo-main {
-          font-size: 18px;
-          font-weight: 800;
-          color: #3b82f6;
-        }
-        
-        .logo-sub {
-          font-size: 10px;
+        .tab-button {
+          position: relative;
+          padding: 1rem 1.5rem;
           font-weight: 500;
-          color: #64748b;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-        }
-        
-        .container {
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 2rem 20px;
-        }
-        
-        .page-header {
-          text-align: center;
-          margin-bottom: 3rem;
-        }
-        
-        .page-title {
-          font-size: 2.5rem;
-          font-weight: 800;
-          color: #1e293b;
-          margin-bottom: 0.5rem;
-          background: linear-gradient(135deg, #1e293b, #3b82f6);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
-        
-        .page-description {
-          font-size: 1.1rem;
-          color: #64748b;
-          max-width: 600px;
-          margin: 0 auto;
-        }
-        
-        .form-container {
-          background: rgba(255, 255, 255, 0.8);
-          border-radius: 16px;
-          padding: 2rem;
-          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .form-section {
-          margin-bottom: 2rem;
-        }
-        
-        .section-title {
-          font-size: 1.25rem;
-          font-weight: 700;
-          color: #1e293b;
-          margin-bottom: 1rem;
+          color: #6b7280;
+          background: none;
+          border: none;
+          cursor: pointer;
+          transition: all 0.3s ease;
           display: flex;
           align-items: center;
           gap: 0.5rem;
         }
         
-        .form-group {
-          margin-bottom: 1.5rem;
+        .tab-button:hover {
+          color: #374151;
+          background-color: #f9fafb;
+        }
+        
+        .tab-button.active {
+          color: #6366f1;
+          background-color: #f3f4f6;
+        }
+        
+        .tab-button.active::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: 2px;
+          background-color: #6366f1;
+        }
+        
+        .concept-card {
+          background: white;
+          border-radius: 0.5rem;
+          box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+          padding: 1.5rem;
+          margin-bottom: 1rem;
+          transition: box-shadow 0.3s ease;
+        }
+        
+        .concept-card:hover {
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .form-container {
+          background: rgba(255, 255, 255, 0.9);
+          border-radius: 16px;
+          padding: 2rem;
+          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         .form-label {
@@ -353,237 +354,264 @@ Basándonos en el análisis de mercado y perfiles de buyer personas, proponemos:
           transform: none;
         }
         
-        .sidebar-card {
-          background: rgba(255, 255, 255, 0.8);
-          border-radius: 16px;
-          padding: 1.5rem;
-          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          margin-bottom: 1rem;
+        .btn-secondary {
+          background: #6b7280;
+          color: white;
         }
         
-        .sidebar-title {
-          font-size: 1.1rem;
-          font-weight: 700;
-          color: #1e293b;
-          margin-bottom: 1rem;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
+        .btn-secondary:hover {
+          background: #4b5563;
         }
         
-        .persona-item {
-          background: rgba(248, 250, 252, 0.8);
-          border-radius: 8px;
-          padding: 0.75rem;
-          margin-bottom: 0.5rem;
+        .btn-success {
+          background: #10b981;
+          color: white;
         }
         
-        .persona-name {
-          font-weight: 600;
-          color: #1e293b;
-          margin-bottom: 0.25rem;
-        }
-        
-        .persona-details {
-          color: #64748b;
-          font-size: 0.875rem;
-        }
-        
-        @media (max-width: 768px) {
-          .container {
-            padding: 1rem 10px;
-          }
-          
-          .form-container {
-            padding: 1.5rem;
-          }
-          
-          .page-title {
-            font-size: 2rem;
-          }
+        .btn-success:hover {
+          background: #059669;
         }
       `}</style>
+      
+      <div className="min-h-screen">
+        <nav className="navbar">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <CreativeIcon className="h-8 w-8 text-indigo-600" />
+                <h1 className="text-2xl font-bold text-gray-900">Generador de Conceptos Creativos</h1>
+              </div>
+            </div>
+          </div>
+        </nav>
 
-      <nav className="navbar">
-        <div className="nav-container">
-          <div className="nav-logo">
-            <CreativeIcon className="h-6 w-6" />
-            <div className="logo-text">
-              <div className="logo-main">INGENES</div>
-              <div className="logo-sub">Marketing</div>
+        {/* Tab Navigation */}
+        <div className="tabbar">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex">
+              <button
+                onClick={() => setActiveTab('create')}
+                className={`tab-button ${activeTab === 'create' ? 'active' : ''}`}
+              >
+                <CreativeIcon className="w-4 h-4" />
+                Generar Concepto
+              </button>
+              <button
+                onClick={() => setActiveTab('view')}
+                className={`tab-button ${activeTab === 'view' ? 'active' : ''}`}
+              >
+                <ChartIcon className="w-4 h-4" />
+                Conceptos Creados ({createdConcepts.length})
+              </button>
             </div>
           </div>
         </div>
-      </nav>
 
-      <div className="container">
-        <div className="page-header">
-          <h1 className="page-title">Generador de Conceptos Creativos</h1>
-          <p className="page-description">
-            Crea estrategias de marketing personalizadas para tus productos
-          </p>
-        </div>
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Create Tab Content */}
+          {activeTab === 'create' && (
+            <div className="space-y-6">
+              <div className="form-container">
+                <h2 className="form-label text-xl font-bold mb-4">Crear Nuevo Concepto Creativo</h2>
+                
+                <div className="space-y-6">
+                  {/* Organization Selection */}
+                  <div>
+                    <label className="form-label">
+                      <OrganizationIcon className="inline-block w-4 h-4 mr-2" />
+                      Organización
+                    </label>
+                    <select
+                      value={selectedOrganization}
+                      onChange={(e) => setSelectedOrganization(e.target.value)}
+                      className="form-input"
+                    >
+                      <option value="">Selecciona una organización</option>
+                      {organizations.map(org => (
+                        <option key={org.id} value={org.id}>{org.name}</option>
+                      ))}
+                    </select>
+                  </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Formulario */}
-          <div className="lg:col-span-2">
-            <div className="form-container">
-              <div className="form-section">
-                <h2 className="section-title">
-                  <CreativeIcon className="h-5 w-5" />
-                  Configurar Concepto Creativo
-                </h2>
+                  {/* Products Selection */}
+                  <div>
+                    <label className="form-label">
+                      <ProductIcon className="inline-block w-4 h-4 mr-2" />
+                      Productos
+                    </label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-60 overflow-y-auto">
+                      {filteredProducts.map(product => (
+                        <label key={product.id} className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            checked={selectedProducts.includes(product.id)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedProducts([...selectedProducts, product.id]);
+                              } else {
+                                setSelectedProducts(selectedProducts.filter(id => id !== product.id));
+                              }
+                            }}
+                            className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                          />
+                          <span className="text-sm text-gray-700">{product.name}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
 
-                {/* Organización */}
-                <div className="form-group">
-                  <label className="form-label">
-                    <OrganizationIcon className="inline h-4 w-4 mr-1" />
-                    Organización
-                  </label>
-                  <select
-                    value={selectedOrganization}
-                    onChange={(e) => setSelectedOrganization(e.target.value)}
-                    className="form-input"
+                  {/* Brief */}
+                  <div>
+                    <label className="form-label">
+                      <PersonaIcon className="inline-block w-4 h-4 mr-2" />
+                      Brief del Cliente
+                    </label>
+                    <textarea
+                      value={brief}
+                      onChange={(e) => setBrief(e.target.value)}
+                      rows={4}
+                      placeholder="Describe el objetivo del concepto creativo, público objetivo, mensajes clave, restricciones, etc."
+                      className="form-input form-textarea"
+                    />
+                  </div>
+
+                  <button
+                    onClick={handleGenerateConcept}
+                    disabled={!selectedOrganization || selectedProducts.length === 0 || !brief || isGenerating}
+                    className="btn btn-primary w-full"
                   >
-                    <option value="">Selecciona una organización</option>
-                    {organizations.map(org => (
-                      <option key={org.id} value={org.id}>{org.name}</option>
-                    ))}
-                  </select>
+                    {isGenerating ? 'Generando...' : 'Generar Concepto'}
+                  </button>
                 </div>
+              </div>
 
-                {/* Productos */}
-                <div className="form-group">
-                  <label className="form-label">
-                    <ProductIcon className="inline h-4 w-4 mr-1" />
-                    Productos
-                  </label>
-                  <div className="space-y-2 max-h-40 overflow-y-auto">
-                    {filteredProducts.map(product => (
-                      <label key={product.id} className="flex items-center">
-                        <input
-                          type="checkbox"
-                          value={product.id}
-                          checked={selectedProducts.includes(product.id)}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setSelectedProducts([...selectedProducts, product.id]);
-                            } else {
-                              setSelectedProducts(selectedProducts.filter(id => id !== product.id));
-                            }
-                          }}
-                          className="mr-2 text-blue-600 focus:ring-blue-500"
-                        />
-                        <span className="text-sm text-gray-700">{product.name}</span>
-                      </label>
-                    ))}
+              {/* Generated Concept */}
+              {generatedConcept && (
+                <div className="form-container">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="form-label text-lg font-bold">Concepto Generado</h3>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={handleSaveConcept}
+                        className="btn btn-success"
+                      >
+                        Guardar Concepto
+                      </button>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(generatedConcept);
+                          alert('Concepto copiado al portapapeles');
+                        }}
+                        className="btn btn-secondary"
+                      >
+                        Copiar
+                      </button>
+                    </div>
+                  </div>
+                  <div className="prose max-w-none">
+                    <pre className="whitespace-pre-wrap font-mono text-sm bg-gray-50 p-4 rounded">
+                      {generatedConcept}
+                    </pre>
                   </div>
                 </div>
-
-                {/* Brief */}
-                <div className="form-group">
-                  <label className="form-label">
-                    <PersonaIcon className="inline h-4 w-4 mr-1" />
-                    Brief del Cliente
-                  </label>
-                  <textarea
-                    value={brief}
-                    onChange={(e) => setBrief(e.target.value)}
-                    rows={4}
-                    placeholder="Describe los objetivos, público objetivo, mensajes clave, y cualquier requerimiento específico..."
-                    className="form-input form-textarea"
-                  />
-                </div>
-
-                {/* Botón Generar */}
-                <button
-                  onClick={handleGenerateConcept}
-                  disabled={isGenerating || !selectedOrganization || selectedProducts.length === 0 || !brief}
-                  className="btn btn-primary w-full"
-                >
-                  {isGenerating ? 'Generando...' : 'Generar Concepto Creativo'}
-                </button>
-              </div>
+              )}
             </div>
-          </div>
+          )}
 
-          {/* Sidebar */}
-          <div className="lg:col-span-1">
-            {/* Resumen */}
-            <div className="sidebar-card">
-              <h3 className="sidebar-title">
-                <ChartIcon className="h-5 w-5" />
-                Resumen de Selección
-              </h3>
-              <div className="space-y-2 text-sm">
-                <div>
-                  <span className="text-gray-600">Organización:</span>
-                  <span className="ml-2 font-medium">
-                    {organizations.find(org => org.id === selectedOrganization)?.name || 'No seleccionada'}
-                  </span>
+          {/* View Tab Content */}
+          {activeTab === 'view' && (
+            <div className="space-y-6">
+              <div className="form-container">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="form-label text-xl font-bold">Conceptos Creativos Guardados</h2>
+                  <button
+                    onClick={() => setActiveTab('create')}
+                    className="btn btn-primary"
+                  >
+                    <CreativeIcon className="inline-block w-4 h-4 mr-2" />
+                    Nuevo Concepto
+                  </button>
                 </div>
-                <div>
-                  <span className="text-gray-600">Productos:</span>
-                  <span className="ml-2 font-medium">{selectedProducts.length}</span>
-                </div>
-                <div>
-                  <span className="text-gray-600">Brief:</span>
-                  <span className="ml-2 font-medium">{brief ? 'Completado' : 'Pendiente'}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Buyer Personas */}
-            <div className="sidebar-card">
-              <h3 className="sidebar-title">
-                <PersonaIcon className="h-5 w-5" />
-                Buyer Personas Disponibles
-              </h3>
-              <div className="space-y-2 max-h-60 overflow-y-auto">
-                {buyerPersonas.map(persona => (
-                  <div key={persona.id} className="persona-item">
-                    <div className="persona-name">{persona.persona_name}</div>
-                    <div className="persona-details">{persona.age_range} • {persona.occupation}</div>
+                
+                {createdConcepts.length === 0 ? (
+                  <div className="text-center py-12">
+                    <CreativeIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No hay conceptos guardados</h3>
+                    <p className="text-gray-600 mb-4">Empieza creando tu primer concepto creativo</p>
+                    <button
+                      onClick={() => setActiveTab('create')}
+                      className="btn btn-primary"
+                    >
+                      Crear Concepto
+                    </button>
                   </div>
-                ))}
+                ) : (
+                  <div className="space-y-4">
+                    {createdConcepts.map((concept) => (
+                      <div key={concept.id} className="concept-card">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="text-lg font-semibold text-gray-900">{concept.title}</h3>
+                          <span className="text-sm text-gray-500">
+                            {concept.createdAt.toLocaleDateString()}
+                          </span>
+                        </div>
+                        
+                        <div className="mb-3">
+                          <p className="text-sm text-gray-600 mb-1">
+                            <strong>Organización:</strong> {concept.organization}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            <strong>Productos:</strong> {concept.products.join(', ')}
+                          </p>
+                        </div>
+                        
+                        <div className="mb-3">
+                          <h4 className="text-sm font-medium text-gray-900 mb-1">Brief:</h4>
+                          <p className="text-sm text-gray-600">{concept.brief}</p>
+                        </div>
+                        
+                        <div className="border-t pt-3">
+                          <h4 className="text-sm font-medium text-gray-900 mb-2">Concepto:</h4>
+                          <div className="prose prose-sm max-w-none">
+                            <pre className="whitespace-pre-wrap font-mono text-xs bg-gray-50 p-3 rounded">
+                              {concept.concept}
+                            </pre>
+                          </div>
+                        </div>
+                        
+                        <div className="mt-4 flex space-x-2">
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(concept.concept);
+                              alert('Concepto copiado al portapapeles');
+                            }}
+                            className="btn btn-secondary text-sm"
+                          >
+                            Copiar
+                          </button>
+                          <button
+                            onClick={() => {
+                              const org = organizations.find(org => org.name === concept.organization);
+                              if (org) {
+                                setSelectedOrganization(org.id);
+                              }
+                              setBrief(concept.brief);
+                              setGeneratedConcept(concept.concept);
+                              setActiveTab('create');
+                            }}
+                            className="btn btn-primary text-sm"
+                          >
+                            Editar
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Resultado */}
-        {generatedConcept && (
-          <div className="mt-8">
-            <div className="form-container">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-900">
-                  <CheckIcon className="inline h-5 w-5 mr-2 text-green-500" />
-                  Concepto Creativo Generado
-                </h2>
-                <button
-                  onClick={() => {
-                    const blob = new Blob([generatedConcept], { type: 'text/markdown' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'concepto-creativo.md';
-                    a.click();
-                  }}
-                  className="btn btn-primary"
-                >
-                  Descargar
-                </button>
-              </div>
-              <div className="prose max-w-none">
-                <pre className="whitespace-pre-wrap text-sm bg-gray-50 p-4 rounded">
-                  {generatedConcept}
-                </pre>
-              </div>
-            </div>
-          </div>
-        )}
+          )}
+        </main>
       </div>
     </>
   );

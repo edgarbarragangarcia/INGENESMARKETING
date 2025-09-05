@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
 
 interface BuyerPersona {
   id?: string | null;
@@ -42,13 +41,33 @@ interface Organization {
   created_at: string;
 }
 
+interface OrganizationFormData {
+  name: string;
+  mission: string;
+  vision: string;
+  strategicObjectives: string[];
+  logo: File | null;
+  buyerPersonas: BuyerPersona[];
+  products: ProductData[];
+}
+
+interface Product {
+  id?: string | null;
+  productName: string;
+  productDescription: string;
+  category: string;
+  price: string;
+  currency: string;
+  status: string;
+}
+
 interface OrganizationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: any) => void;
+  onSubmit: (data: OrganizationFormData) => void;
   editingOrganization?: Organization | null;
-  organizationPersonas?: any[];
-  organizationProducts?: any[];
+  organizationPersonas?: BuyerPersona[];
+  organizationProducts?: Product[];
   isEditMode?: boolean;
 }
 
@@ -121,17 +140,17 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({
       if (organizationPersonas && organizationPersonas.length > 0) {
         const formattedPersonas = organizationPersonas.map(persona => ({
           id: persona.id,
-          personaName: persona.name || '',
-          ageRange: persona.age_range || '',
+          personaName: persona.personaName || '',
+          ageRange: persona.ageRange || '',
           gender: persona.gender || '',
           occupation: persona.occupation || '',
-          incomeLevel: persona.income_level || '',
-          educationLevel: persona.education_level || '',
+          incomeLevel: persona.incomeLevel || '',
+          educationLevel: persona.educationLevel || '',
           location: persona.location || '',
-          painPoints: persona.pain_points || [''],
+          painPoints: persona.painPoints || [''],
           goals: persona.goals || [''],
-          preferredChannels: persona.preferred_channels || [''],
-          behaviorPatterns: persona.behavior_patterns || '',
+          preferredChannels: persona.preferredChannels || [''],
+          behaviorPatterns: persona.behaviorPatterns || '',
           motivations: persona.motivations || '',
           frustrations: persona.frustrations || '',
           personaAvatar: null
@@ -143,8 +162,8 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({
       if (organizationProducts && organizationProducts.length > 0) {
         const formattedProducts = organizationProducts.map(product => ({
           id: product.id,
-          productName: product.name || '',
-          productDescription: product.description || '',
+          productName: product.productName || '',
+          productDescription: product.productDescription || '',
           category: product.category || '',
           price: product.price?.toString() || '',
           currency: product.currency || 'USD',
@@ -252,8 +271,12 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const formData = {
-        organization: organizationData,
+      const formData: OrganizationFormData = {
+        name: organizationData.name,
+        mission: organizationData.mission,
+        vision: organizationData.vision,
+        strategicObjectives: organizationData.strategicObjectives,
+        logo: organizationData.logo,
         buyerPersonas,
         products
       };
@@ -266,16 +289,25 @@ const OrganizationModal: React.FC<OrganizationModalProps> = ({
     }
   };
 
-  const addArrayField = (field: string, setter: any, current: any) => {
-    setter({ ...current, [field]: [...current[field], ''] });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const addArrayField = (field: string, setter: React.Dispatch<React.SetStateAction<any>>, current: any) => {
+    const currentArray = (current[field] as string[]) || [];
+    const newArray = [...currentArray, ''];
+    setter({ ...current, [field]: newArray });
   };
 
-  const removeArrayField = (field: string, index: number, setter: any, current: any) => {
-    setter({ ...current, [field]: current[field].filter((_: any, i: number) => i !== index) });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const removeArrayField = (field: string, index: number, setter: React.Dispatch<React.SetStateAction<any>>, current: any) => {
+    const currentArray = (current[field] as string[]) || [];
+    const newArray = currentArray.filter((_: string, i: number) => i !== index);
+    setter({ ...current, [field]: newArray });
   };
 
-  const updateArrayField = (field: string, index: number, value: string, setter: any, current: any) => {
-    setter({ ...current, [field]: current[field].map((item: string, i: number) => i === index ? value : item) });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const updateArrayField = (field: string, index: number, value: string, setter: React.Dispatch<React.SetStateAction<any>>, current: any) => {
+    const currentArray = (current[field] as string[]) || [];
+    const newArray = currentArray.map((item: string, i: number) => i === index ? value : item);
+    setter({ ...current, [field]: newArray });
   };
 
   return (

@@ -22,7 +22,6 @@ import {
   AgeIcon,
   OccupationIcon,
   LocationIcon,
-  CheckIcon,
   ChartIcon
 } from './Icons';
 
@@ -48,6 +47,16 @@ interface Product {
   currency: string;
   status: string;
   created_at: string;
+}
+
+interface ProductData {
+  id?: string | null;
+  productName: string;
+  productDescription: string;
+  category: string;
+  price: string;
+  currency: string;
+  status: string;
 }
 
 interface ConceptoCreativo {
@@ -124,12 +133,12 @@ const Dashboard: React.FC = () => {
     productos: [],
     brief: ''
   });
-  const [organizationPersonas, setOrganizationPersonas] = useState<any[]>([]);
-  const [organizationProducts, setOrganizationProducts] = useState<any[]>([]);
-  const [conceptoBuyerPersonas, setConceptoBuyerPersonas] = useState<any[]>([]);
+  const [organizationPersonas, setOrganizationPersonas] = useState<BuyerPersona[]>([]);
+  const [organizationProducts, setOrganizationProducts] = useState<ProductData[]>([]);
+  const [conceptoBuyerPersonas, setConceptoBuyerPersonas] = useState<BuyerPersona[]>([]);
 
   // Función para manejar el envío del modal
-  const handleModalSubmit = async (formData: any) => {
+  const handleModalSubmit = async (formData: OrganizationFormData) => {
     try {
       const user = await authService.getCurrentUser();
       
@@ -139,10 +148,10 @@ const Dashboard: React.FC = () => {
       }
 
       const organizationData = {
-        name: formData.organization.name,
-        mission: formData.organization.mission,
-        vision: formData.organization.vision,
-        strategic_objectives: formData.organization.strategicObjectives.filter((obj: string) => obj.trim() !== ''),
+        name: formData.name,
+        mission: formData.mission,
+        vision: formData.vision,
+        strategic_objectives: formData.strategicObjectives.filter((obj: string) => obj.trim() !== ''),
         ...(isEditMode ? {} : { created_by: user.id })
       };
 
@@ -202,16 +211,16 @@ const Dashboard: React.FC = () => {
             const personaData = {
               organization_id: orgResult.id,
               name: persona.personaName,
-              age_range: persona.ageRange,
+              ageRange: persona.ageRange,
               gender: persona.gender,
               occupation: persona.occupation,
-              income_level: persona.incomeLevel,
-              education_level: persona.educationLevel,
+              incomeLevel: persona.incomeLevel,
+              educationLevel: persona.educationLevel,
               location: persona.location,
-              pain_points: persona.painPoints.filter((p: string) => p.trim() !== ''),
+              painPoints: persona.painPoints.filter((p: string) => p.trim() !== ''),
               goals: persona.goals.filter((g: string) => g.trim() !== ''),
-              preferred_channels: persona.preferredChannels.filter((c: string) => c.trim() !== ''),
-              behavior_patterns: persona.behaviorPatterns,
+              preferredChannels: persona.preferredChannels.filter((c: string) => c.trim() !== ''),
+              behaviorPatterns: persona.behaviorPatterns,
               motivations: persona.motivations,
               frustrations: persona.frustrations
             };
@@ -362,7 +371,24 @@ const Dashboard: React.FC = () => {
       if (personasError) {
         console.error('Error al cargar buyer personas:', personasError);
       } else {
-        setOrganizationPersonas(personas || []);
+        const formattedPersonas = (personas || []).map(persona => ({
+          id: persona.id,
+          personaName: persona.name || '',
+          ageRange: persona.age_range || '',
+          gender: persona.gender || '',
+          occupation: persona.occupation || '',
+          incomeLevel: persona.income_level || '',
+          educationLevel: persona.education_level || '',
+          location: persona.location || '',
+          painPoints: persona.pain_points || [],
+          goals: persona.goals || [],
+          preferredChannels: persona.preferred_channels || [],
+          behaviorPatterns: persona.behavior_patterns || '',
+          motivations: persona.motivations || '',
+          frustrations: persona.frustrations || '',
+          personaAvatar: null
+        }));
+        setOrganizationPersonas(formattedPersonas);
       }
 
       // Cargar productos
@@ -375,7 +401,16 @@ const Dashboard: React.FC = () => {
       if (productsError) {
         console.error('Error al cargar productos:', productsError);
       } else {
-        setOrganizationProducts(products || []);
+        const formattedProducts = (products || []).map(product => ({
+          id: product.id,
+          productName: product.name || '',
+          productDescription: product.description || '',
+          category: product.category || '',
+          price: product.price?.toString() || '',
+          currency: product.currency || 'USD',
+          status: product.status || 'active'
+        }));
+        setOrganizationProducts(formattedProducts);
       }
     } catch (error) {
       console.error('Error al cargar datos relacionados:', error);
@@ -3703,10 +3738,10 @@ const Dashboard: React.FC = () => {
                                 conceptoBuyerPersonas.map((persona) => (
                                   <div key={persona.id} className="item-card-compact persona">
                                     <div className="item-header-compact">
-                                      <span className="item-name">{persona.name}</span>
+                                      <span className="item-name">{persona.personaName}</span>
                                     </div>
                                     <div className="persona-info-compact">
-                                      <span><AgeIcon /> {persona.age_range}</span>
+                                      <span><AgeIcon /> {persona.ageRange}</span>
                                       <span><OccupationIcon /> {persona.occupation}</span>
                                       <span><LocationIcon /> {persona.location}</span>
                                     </div>

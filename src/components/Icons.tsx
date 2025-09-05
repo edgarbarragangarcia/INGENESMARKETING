@@ -7,7 +7,7 @@ interface IconProps {
 }
 
 // Iconos de navegación principales
-export const DashboardIcon: React.FC<IconProps> = ({ size = 20, color = 'currentColor', className = '' }) => (
+export const DashboardIcon: React.FC<IconProps> = ({ size = 20, className = '' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
     <defs>
       <linearGradient id="dashboardGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -22,7 +22,7 @@ export const DashboardIcon: React.FC<IconProps> = ({ size = 20, color = 'current
   </svg>
 );
 
-export const OrganizationIcon: React.FC<IconProps> = ({ size = 20, color = 'currentColor', className = '' }) => (
+export const OrganizationIcon: React.FC<IconProps> = ({ size = 20, className = '' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
     <defs>
       <linearGradient id="orgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -39,7 +39,7 @@ export const OrganizationIcon: React.FC<IconProps> = ({ size = 20, color = 'curr
   </svg>
 );
 
-export const CreativeIcon: React.FC<IconProps> = ({ size = 20, color = 'currentColor', className = '' }) => (
+export const CreativeIcon: React.FC<IconProps> = ({ size = 20, className = '' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
     <defs>
       <linearGradient id="creativeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -53,7 +53,7 @@ export const CreativeIcon: React.FC<IconProps> = ({ size = 20, color = 'currentC
   </svg>
 );
 
-export const PatientsIcon: React.FC<IconProps> = ({ size = 20, color = 'currentColor', className = '' }) => (
+export const PatientsIcon: React.FC<IconProps> = ({ size = 20, className = '' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
     <defs>
       <linearGradient id="patientsGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -69,7 +69,7 @@ export const PatientsIcon: React.FC<IconProps> = ({ size = 20, color = 'currentC
 );
 
 // Iconos de acciones
-export const AddIcon: React.FC<IconProps> = ({ size = 20, color = 'currentColor', className = '' }) => (
+export const AddIcon: React.FC<IconProps> = ({ size = 20, className = '' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
     <defs>
       <linearGradient id="addGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -82,7 +82,7 @@ export const AddIcon: React.FC<IconProps> = ({ size = 20, color = 'currentColor'
   </svg>
 );
 
-export const EditIcon: React.FC<IconProps> = ({ size = 20, color = 'currentColor', className = '' }) => (
+export const EditIcon: React.FC<IconProps> = ({ size = 20, className = '' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
     <defs>
       <linearGradient id="editGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -95,7 +95,7 @@ export const EditIcon: React.FC<IconProps> = ({ size = 20, color = 'currentColor
   </svg>
 );
 
-export const DeleteIcon: React.FC<IconProps> = ({ size = 20, color = 'currentColor', className = '' }) => (
+export const DeleteIcon: React.FC<IconProps> = ({ size = 20, className = '' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
     <defs>
       <linearGradient id="deleteGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -108,7 +108,7 @@ export const DeleteIcon: React.FC<IconProps> = ({ size = 20, color = 'currentCol
   </svg>
 );
 
-export const SearchIcon: React.FC<IconProps> = ({ size = 20, color = 'currentColor', className = '' }) => (
+export const SearchIcon: React.FC<IconProps> = ({ size = 20, className = '' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
     <defs>
       <linearGradient id="searchGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -122,7 +122,7 @@ export const SearchIcon: React.FC<IconProps> = ({ size = 20, color = 'currentCol
 );
 
 // Iconos de productos y personas
-export const ProductIcon: React.FC<IconProps> = ({ size = 20, color = 'currentColor', className = '' }) => (
+export const ProductIcon: React.FC<IconProps> = ({ size = 20, className = '' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
     <defs>
       <linearGradient id="productGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -136,7 +136,7 @@ export const ProductIcon: React.FC<IconProps> = ({ size = 20, color = 'currentCo
   </svg>
 );
 
-export const PersonaIcon: React.FC<IconProps> = ({ size = 20, color = 'currentColor', className = '' }) => (
+export const PersonaIcon: React.FC<IconProps> = ({ size = 20, className = '' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
     <defs>
       <linearGradient id="personaGradient" x1="0%" y1="0%" x2="100%" y2="100%">

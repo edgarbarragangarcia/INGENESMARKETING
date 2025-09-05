@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { authService, supabase } from '@/lib/supabase';
 
@@ -410,13 +411,13 @@ function CreateOrganizationPage() {
       
       <nav className="navbar">
         <div className="nav-container">
-          <a href="/" className="nav-logo">
+          <Link href="/" className="nav-logo">
             <i className="fas fa-rocket"></i>
             <div className="logo-text">
               <span className="logo-main">INGENES</span>
               <span className="logo-sub">Marketing</span>
             </div>
-          </a>
+          </Link>
           
           <div className="nav-actions">
             <button 

@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import LandingPage from '@/components/LandingPage';
 import DashboardPage from '@/components/DashboardPage';
 import CreateOrganizationPage from '@/components/CreateOrganizationPage';
-import ConceptoCreativoPage from '@/components/ConceptoCreativoPage';
 import { authService } from '@/lib/supabase';
 
 export default function Home() {

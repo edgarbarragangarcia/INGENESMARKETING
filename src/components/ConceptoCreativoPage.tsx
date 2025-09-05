@@ -11,6 +11,7 @@ import {
   CheckIcon,
   ChartIcon
 } from './Icons';
+import Image from 'next/image';
 
 interface Organization {
   id: string;
@@ -68,10 +69,44 @@ const ConceptoCreativoPage: React.FC = () => {
     concept: string;
     createdAt: Date;
   }>>([]);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     loadInitialData();
+    loadCurrentUser();
   }, []);
+
+  const loadCurrentUser = async () => {
+    try {
+      const user = await authService.getCurrentUser();
+      setCurrentUser(user);
+    } catch (error) {
+      console.error('Error loading current user:', error);
+    }
+  };
+
+  const handleNavClick = (section: string) => {
+    window.location.hash = section;
+  };
+
+  const toggleUserMenu = () => {
+    setIsUserMenuOpen(!isUserMenuOpen);
+  };
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await authService.signOut();
+      window.location.href = '/';
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
 
   const loadInitialData = async () => {
     try {
@@ -373,13 +408,72 @@ Basándonos en el análisis de mercado y perfiles de buyer personas, proponemos:
         }
       `}</style>
       
-      <div className="min-h-screen">
+      <div className="min-h-screen bg-gray-50">
+        {/* Navigation Header */}
         <nav className="navbar">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <CreativeIcon className="h-8 w-8 text-indigo-600" />
-                <h1 className="text-2xl font-bold text-gray-900">Generador de Conceptos Creativos</h1>
+            <div className="nav-container">
+              <div className="nav-left">
+                <div className="nav-brand">
+                  <CreativeIcon className="h-8 w-8 text-indigo-600" />
+                  <span className="brand-text">Ingenes Marketing</span>
+                </div>
+                
+                <div className="nav-links">
+                  <a 
+                    href="#dashboard" 
+                    className="nav-link"
+                    onClick={() => handleNavClick('dashboard')}
+                  >
+                    Dashboard
+                  </a>
+                  <a 
+                    href="#organizaciones" 
+                    className="nav-link"
+                    onClick={() => handleNavClick('organizaciones')}
+                  >
+                    Organizaciones
+                  </a>
+                  <a 
+                    href="#concepto-creativo" 
+                    className="nav-link active"
+                    onClick={() => handleNavClick('concepto-creativo')}
+                  >
+                    Concepto Creativo
+                  </a>
+                </div>
+              </div>
+
+              <div className="nav-right">
+                <div className="user-avatar-container">
+                  <div className="user-avatar" onClick={toggleUserMenu}>
+                    <Image 
+                      src={currentUser?.user_metadata?.avatar_url || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face"} 
+                      alt={currentUser?.user_metadata?.name || "Usuario"} 
+                      width={40}
+                      height={40}
+                      className="avatar-image"
+                    />
+                    <div className="user-info">
+                      <span className="user-name">{currentUser?.user_metadata?.name || "Usuario"}</span>
+                      <span className="user-role">{currentUser?.email || "Usuario"}</span>
+                    </div>
+                  </div>
+                  
+                  {isUserMenuOpen && (
+                    <div className="user-dropdown">
+                      <button className="logout-btn" onClick={handleLogout}>
+                        Cerrar Sesión
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <div className={`hamburger ${isMobileMenuOpen ? 'active' : ''}`} onClick={toggleMobileMenu}>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
               </div>
             </div>
           </div>

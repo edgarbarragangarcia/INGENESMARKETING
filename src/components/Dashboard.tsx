@@ -137,6 +137,15 @@ const Dashboard: React.FC = () => {
   const [organizationProducts, setOrganizationProducts] = useState<ProductData[]>([]);
   const [conceptoBuyerPersonas, setConceptoBuyerPersonas] = useState<BuyerPersona[]>([]);
   const [currentUser, setCurrentUser] = useState<any>(null);
+  
+  // Concepto Creativo Tab States
+  const [activeTab, setActiveTab] = useState('create');
+  const [selectedOrganization, setSelectedOrganization] = useState('');
+  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+  const [brief, setBrief] = useState('');
+  const [generatedConcept, setGeneratedConcept] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [createdConcepts, setCreatedConcepts] = useState<any[]>([]);
 
   // Función para manejar el envío del modal
   const handleModalSubmit = async (formData: OrganizationFormData) => {
@@ -662,6 +671,91 @@ const Dashboard: React.FC = () => {
       brief
     }));
   };
+
+  // Concepto Creativo Functions
+  const handleGenerateConcept = async () => {
+    if (!selectedOrganization || selectedProducts.length === 0 || !brief) return;
+    
+    setIsGenerating(true);
+    try {
+      const organization = organizations.find(org => org.id === selectedOrganization);
+      const selectedProductsData = products.filter(p => selectedProducts.includes(p.id));
+      
+      const prompt = `
+Crea un concepto creativo para:
+Organización: ${organization?.name}
+Misión: ${organization?.mission}
+Visión: ${organization?.vision}
+
+Productos seleccionados:
+${selectedProductsData.map(p => `- ${p.name}: ${p.description}`).join('\n')}
+
+Brief del cliente:
+${brief}
+
+Genera un concepto creativo completo que incluya:
+1. Concepto principal
+2. Mensaje clave
+3. Tono de comunicación
+4. Propuesta de valor
+5. Call to action
+6. Elementos visuales sugeridos
+`;
+      
+      // Simular generación de concepto (aquí podrías integrar con OpenAI)
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      setGeneratedConcept(`CONCEPTO CREATIVO PARA ${organization?.name?.toUpperCase()}
+
+🎯 CONCEPTO PRINCIPAL
+"Transformando vidas a través de la innovación"
+
+💬 MENSAJE CLAVE
+Conectamos con las necesidades reales de nuestros clientes, ofreciendo soluciones que van más allá de sus expectativas.
+
+🎨 TONO DE COMUNICACIÓN
+- Cercano y empático
+- Profesional pero accesible
+- Inspirador y motivacional
+
+💎 PROPUESTA DE VALOR
+${selectedProductsData.map(p => `• ${p.name}: Solución integral que ${p.description.toLowerCase()}`).join('\n')}
+
+📢 CALL TO ACTION
+"Descubre cómo podemos transformar tu experiencia. ¡Contáctanos hoy!"
+
+🎨 ELEMENTOS VISUALES SUGERIDOS
+- Paleta de colores cálidos y profesionales
+- Imágenes que reflejen transformación y éxito
+- Tipografía moderna y legible
+- Iconografía que represente innovación y confianza
+
+📝 BRIEF INTEGRADO
+${brief}`);
+    } catch (error) {
+      console.error('Error generating concept:', error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleSaveConcept = async () => {
+    if (!generatedConcept) return;
+    
+    const newConcept = {
+      id: Date.now().toString(),
+      title: `Concepto para ${organizations.find(org => org.id === selectedOrganization)?.name}`,
+      content: generatedConcept,
+      organizationId: selectedOrganization,
+      products: selectedProducts,
+      brief,
+      createdAt: new Date()
+    };
+    
+    setCreatedConcepts(prev => [newConcept, ...prev]);
+    alert('Concepto guardado exitosamente');
+  };
+
+  const filteredProducts = products.filter(p => p.organization_id === selectedOrganization);
 
   const handleLogout = async () => {
     try {
@@ -3657,183 +3751,299 @@ const Dashboard: React.FC = () => {
               
               {activeSection === 'concepto-creativo' && (
                 <div className="concepto-creativo-page">
-                  <div className="page-header compact">
-                    <h1 className="page-title">
-                      <CreativeIcon />
-                      Concepto Creativo
-                    </h1>
-                    <p className="page-description">
-                      Crea conceptos creativos seleccionando una organización, sus productos y agregando un brief de campaña.
-                    </p>
+                  {/* Tab Navigation */}
+                  <div className="tabbar" style={{
+                    background: 'white',
+                    borderBottom: '1px solid #e5e7eb',
+                    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+                    marginBottom: '2rem'
+                  }}>
+                    <div className="flex">
+                      <button
+                        onClick={() => setActiveTab('create')}
+                        className={`tab-button ${activeTab === 'create' ? 'active' : ''}`}
+                        style={{
+                          position: 'relative',
+                          padding: '1rem 1.5rem',
+                          fontWeight: '500',
+                          color: activeTab === 'create' ? '#6366f1' : '#6b7280',
+                          background: activeTab === 'create' ? '#f3f4f6' : 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.5rem'
+                        }}
+                      >
+                        <CreativeIcon />
+                        Generar Concepto
+                        {activeTab === 'create' && (
+                          <div style={{
+                            position: 'absolute',
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            height: '2px',
+                            backgroundColor: '#6366f1'
+                          }} />
+                        )}
+                      </button>
+                      <button
+                        onClick={() => setActiveTab('view')}
+                        className={`tab-button ${activeTab === 'view' ? 'active' : ''}`}
+                        style={{
+                          position: 'relative',
+                          padding: '1rem 1.5rem',
+                          fontWeight: '500',
+                          color: activeTab === 'view' ? '#6366f1' : '#6b7280',
+                          background: activeTab === 'view' ? '#f3f4f6' : 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.5rem'
+                        }}
+                      >
+                        <ChartIcon />
+                        Conceptos Creados ({createdConcepts.length})
+                        {activeTab === 'view' && (
+                          <div style={{
+                            position: 'absolute',
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            height: '2px',
+                            backgroundColor: '#6366f1'
+                          }} />
+                        )}
+                      </button>
+                    </div>
                   </div>
-                  
-                  <div className="page-content">
-                    <div className="concepto-form-compact">
-                      {/* Selector de Organización - Compacto */}
-                      <div className="form-section-compact">
-                        <h3 className="section-title-compact">
-                          <OrganizationIcon />
-                          Organización
-                        </h3>
-                        <select 
-                          value={conceptoCreativo.organizacion}
-                          onChange={(e) => handleOrganizacionChange(e.target.value)}
-                          className="form-select-compact"
-                        >
-                          <option value="">Selecciona una organización...</option>
-                          {organizations.map((org) => (
-                            <option key={org.id} value={org.id}>
-                              {org.name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
 
-                      {/* Layout de dos columnas para productos y personas */}
-                      {conceptoCreativo.organizacion && (
-                        <div className="two-column-layout">
-                          {/* Columna izquierda - Productos */}
+                  {/* Create Tab Content */}
+                  {activeTab === 'create' && (
+                    <div className="space-y-6">
+                      <div className="form-section-compact">
+                        <h2 className="section-title-compact" style={{ fontSize: '20px', marginBottom: '1rem' }}>Crear Nuevo Concepto Creativo</h2>
+                        
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                          {/* Organization Selection */}
+                          <div className="form-section-compact">
+                            <h3 className="section-title-compact">
+                              <OrganizationIcon />
+                              Organización
+                            </h3>
+                            <select
+                              value={selectedOrganization}
+                              onChange={(e) => setSelectedOrganization(e.target.value)}
+                              className="form-select-compact"
+                            >
+                              <option value="">Selecciona una organización</option>
+                              {organizations.map(org => (
+                                <option key={org.id} value={org.id}>{org.name}</option>
+                              ))}
+                            </select>
+                          </div>
+
+                          {/* Products Selection */}
                           <div className="form-section-compact">
                             <h3 className="section-title-compact">
                               <ProductIcon />
-                              Productos ({products.length})
+                              Productos
                             </h3>
-                            <div className="products-grid-compact">
-                              {products.length === 0 ? (
-                                <div className="no-items-compact">
-                                  <ProductIcon />
-                                  <span>No hay productos disponibles</span>
-                                </div>
-                              ) : (
-                                products.map((product) => (
-                                  <div 
-                                    key={product.id} 
-                                    className={`item-card-compact ${
-                                      conceptoCreativo.productos.includes(product.id) ? 'selected' : ''
-                                    }`}
-                                    onClick={() => handleProductoToggle(product.id)}
-                                  >
-                                    <div className="item-header-compact">
-                                      <span className="item-name">{product.name}</span>
-                                      <input 
-                                        type="checkbox" 
-                                        checked={conceptoCreativo.productos.includes(product.id)}
-                                        onChange={() => handleProductoToggle(product.id)}
-                                      />
-                                    </div>
-                                    <div className="item-details-compact">
-                                      <span className="item-category">{product.category}</span>
-                                      <span className="item-price">
-                                        {product.currency} {product.price?.toLocaleString()}
-                                      </span>
-                                    </div>
-                                  </div>
-                                ))
-                              )}
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '0.75rem', maxHeight: '240px', overflowY: 'auto' }}>
+                              {filteredProducts.map(product => (
+                                <label key={product.id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                  <input
+                                    type="checkbox"
+                                    checked={selectedProducts.includes(product.id)}
+                                    onChange={(e) => {
+                                      if (e.target.checked) {
+                                        setSelectedProducts([...selectedProducts, product.id]);
+                                      } else {
+                                        setSelectedProducts(selectedProducts.filter(id => id !== product.id));
+                                      }
+                                    }}
+                                    style={{ borderRadius: '4px', borderColor: '#d1d5db', color: '#6366f1' }}
+                                  />
+                                  <span style={{ fontSize: '14px', color: '#374151' }}>{product.name}</span>
+                                </label>
+                              ))}
                             </div>
                           </div>
 
-                          {/* Columna derecha - Buyer Personas */}
-                          <div className="form-section-compact">
-                            <h3 className="section-title-compact">
-                              <PersonaIcon />
-                              Buyer Personas ({conceptoBuyerPersonas.length})
-                            </h3>
-                            <div className="personas-grid-compact">
-                              {conceptoBuyerPersonas.length === 0 ? (
-                                <div className="no-items-compact">
-                                  <PersonaIcon />
-                                  <span>No hay buyer personas disponibles</span>
-                                </div>
-                              ) : (
-                                conceptoBuyerPersonas.map((persona) => (
-                                  <div key={persona.id} className="item-card-compact persona">
-                                    <div className="item-header-compact">
-                                      <span className="item-name">{persona.personaName}</span>
-                                    </div>
-                                    <div className="persona-info-compact">
-                                      <span><AgeIcon /> {persona.ageRange}</span>
-                                      <span><OccupationIcon /> {persona.occupation}</span>
-                                      <span><LocationIcon /> {persona.location}</span>
-                                    </div>
-                                  </div>
-                                ))
-                              )}
+                          {/* Brief */}
+                           <div className="form-section-compact">
+                             <h3 className="section-title-compact">
+                               <i className="fas fa-file-alt"></i>
+                               Brief de Campaña
+                             </h3>
+                             <textarea
+                               value={brief}
+                               onChange={(e) => setBrief(e.target.value)}
+                               placeholder="Describe el concepto creativo que necesitas..."
+                               className="form-textarea-compact"
+                               rows={4}
+                               style={{
+                                 width: '100%',
+                                 padding: '0.75rem',
+                                 border: '1px solid #d1d5db',
+                                 borderRadius: '0.375rem',
+                                 fontSize: '14px',
+                                 resize: 'vertical'
+                               }}
+                             />
+                           </div>
+
+                           {/* Generate Button */}
+                           <button
+                             onClick={handleGenerateConcept}
+                             disabled={!selectedOrganization || selectedProducts.length === 0 || !brief.trim() || isGenerating}
+                             className="generate-button"
+                             style={{
+                               width: '100%',
+                               padding: '0.75rem 1.5rem',
+                               backgroundColor: (!selectedOrganization || selectedProducts.length === 0 || !brief.trim() || isGenerating) ? '#9ca3af' : '#6366f1',
+                               color: 'white',
+                               border: 'none',
+                               borderRadius: '0.375rem',
+                               fontSize: '16px',
+                               fontWeight: '500',
+                               cursor: (!selectedOrganization || selectedProducts.length === 0 || !brief.trim() || isGenerating) ? 'not-allowed' : 'pointer',
+                               display: 'flex',
+                               alignItems: 'center',
+                               justifyContent: 'center',
+                               gap: '0.5rem'
+                             }}
+                           >
+                             {isGenerating ? (
+                               <>
+                                 <div className="spinner" style={{
+                                   width: '16px',
+                                   height: '16px',
+                                   border: '2px solid #ffffff40',
+                                   borderTop: '2px solid #ffffff',
+                                   borderRadius: '50%',
+                                   animation: 'spin 1s linear infinite'
+                                 }} />
+                                 Generando...
+                               </>
+                             ) : (
+                               <>
+                                 <CreativeIcon />
+                                 Generar Concepto Creativo
+                               </>
+                             )}
+                           </button>
+                         </div>
+                       </div>
+
+                       {/* Generated Concept Display */}
+                       {generatedConcept && (
+                         <div className="generated-concept" style={{
+                           marginTop: '2rem',
+                           padding: '1.5rem',
+                           backgroundColor: '#f9fafb',
+                           border: '1px solid #e5e7eb',
+                           borderRadius: '0.5rem'
+                         }}>
+                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                             <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#111827' }}>Concepto Generado</h3>
+                             <button
+                               onClick={handleSaveConcept}
+                               className="save-button"
+                               style={{
+                                 padding: '0.5rem 1rem',
+                                 backgroundColor: '#10b981',
+                                 color: 'white',
+                                 border: 'none',
+                                 borderRadius: '0.375rem',
+                                 fontSize: '14px',
+                                 fontWeight: '500',
+                                 cursor: 'pointer',
+                                 display: 'flex',
+                                 alignItems: 'center',
+                                 gap: '0.5rem'
+                               }}
+                             >
+                               <i className="fas fa-save"></i>
+                               Guardar Concepto
+                             </button>
+                           </div>
+                           <div style={{
+                             padding: '1rem',
+                             backgroundColor: 'white',
+                             borderRadius: '0.375rem',
+                             whiteSpace: 'pre-wrap',
+                             lineHeight: '1.6',
+                             color: '#374151'
+                           }}>
+                             {generatedConcept}
+                           </div>
+                         </div>
+                       )}
+                     </div>
+                   )}
+
+                   {/* View Tab Content */}
+                   {activeTab === 'view' && (
+                     <div className="space-y-6">
+                       <h2 className="section-title-compact" style={{ fontSize: '20px', marginBottom: '1rem' }}>Conceptos Creados</h2>
+                       
+                       {createdConcepts.length === 0 ? (
+                         <div style={{
+                           textAlign: 'center',
+                           padding: '3rem',
+                           color: '#6b7280'
+                         }}>
+                           <div style={{ fontSize: '48px', marginBottom: '1rem', opacity: 0.5 }}>
+                              <ChartIcon />
                             </div>
-                          </div>
-                        </div>
-                      )}
+                           <p style={{ fontSize: '18px', marginBottom: '0.5rem' }}>No hay conceptos creados</p>
+                           <p style={{ fontSize: '14px' }}>Crea tu primer concepto creativo en la pestaña "Generar Concepto"</p>
+                         </div>
+                       ) : (
+                         <div style={{ display: 'grid', gap: '1rem' }}>
+                           {createdConcepts.map((concept, index) => (
+                             <div key={index} style={{
+                               padding: '1.5rem',
+                               backgroundColor: 'white',
+                               border: '1px solid #e5e7eb',
+                               borderRadius: '0.5rem',
+                               boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
+                             }}>
+                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                                 <div>
+                                   <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#111827', marginBottom: '0.5rem' }}>
+                                     Concepto #{index + 1}
+                                   </h3>
+                                   <p style={{ fontSize: '14px', color: '#6b7280' }}>
+                                     Creado el {new Date(concept.createdAt).toLocaleDateString()}
+                                   </p>
+                                 </div>
+                               </div>
+                               <div style={{
+                                 padding: '1rem',
+                                 backgroundColor: '#f9fafb',
+                                 borderRadius: '0.375rem',
+                                 whiteSpace: 'pre-wrap',
+                                 lineHeight: '1.6',
+                                 color: '#374151',
+                                 fontSize: '14px'
+                               }}>
+                                 {concept.content}
+                               </div>
+                             </div>
+                           ))}
+                         </div>
+                       )}
+                     </div>
+                   )}
+                 </div>
+               )}
 
-                      {/* Brief de Campaña - Compacto */}
-                      <div className="form-section-compact">
-                        <h3 className="section-title-compact">
-                          <i className="fas fa-file-alt"></i>
-                          Brief de Campaña
-                          <span className="optional">(Opcional)</span>
-                        </h3>
-                        <div className="brief-container-compact">
-                          <textarea
-                            value={conceptoCreativo.brief}
-                            onChange={(e) => handleBriefChange(e.target.value)}
-                            placeholder="Describe los objetivos, público objetivo, mensaje clave y tono de comunicación..."
-                            className="brief-textarea-compact"
-                            rows={4}
-                          />
-                          <div className="brief-counter-compact">
-                            {conceptoCreativo.brief.length} caracteres
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Resumen del Concepto - Compacto */}
-                      {(conceptoCreativo.organizacion || conceptoCreativo.productos.length > 0 || conceptoCreativo.brief) && (
-                        <div className="form-section-compact summary">
-                          <h3 className="section-title-compact">
-                            <i className="fas fa-eye"></i>
-                            Resumen
-                          </h3>
-                          <div className="concepto-summary-compact">
-                            {conceptoCreativo.organizacion && (
-                              <div className="summary-row">
-                                <strong>Organización:</strong>
-                                <span>{organizations.find(org => org.id === conceptoCreativo.organizacion)?.name}</span>
-                              </div>
-                            )}
-                            
-                            {conceptoCreativo.productos.length > 0 && (
-                              <div className="summary-row">
-                                <strong>Productos ({conceptoCreativo.productos.length}):</strong>
-                                <div className="selected-items">
-                                  {conceptoCreativo.productos.map(prodId => {
-                                    const product = products.find(p => p.id === prodId);
-                                    return product ? (
-                                      <span key={prodId} className="item-tag">
-                                        {product.name}
-                                      </span>
-                                    ) : null;
-                                  })}
-                                </div>
-                              </div>
-                            )}
-                            
-                            {conceptoCreativo.brief && (
-                              <div className="summary-row">
-                                <strong>Brief:</strong>
-                                <p className="brief-preview-compact">
-                                  {conceptoCreativo.brief.length > 150 
-                                    ? `${conceptoCreativo.brief.substring(0, 150)}...` 
-                                    : conceptoCreativo.brief
-                                  }
-                                </p>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
           </div>
         </main>
       </div>

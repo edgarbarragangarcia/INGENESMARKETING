@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import LandingPage from '@/components/LandingPage';
 import DashboardPage from '@/components/DashboardPage';
 import CreateOrganizationPage from '@/components/CreateOrganizationPage';
+import ConceptoCreativoPage from '@/components/ConceptoCreativoPage';
 import { authService } from '@/lib/supabase';
 
 export default function Home() {
@@ -17,7 +18,8 @@ export default function Home() {
         
         // Verificar el hash de la URL
         const hash = window.location.hash;
-        const validDashboardHashes = ['#dashboard', '#organizaciones', '#concepto-creativo', '#pacientes'];
+        const validDashboardHashes = ['#dashboard', '#organizaciones', '#pacientes'];
+        const isConceptoCreativoRoute = hash === '#concepto-creativo';
         const isDashboardRoute = validDashboardHashes.some(validHash => hash === validHash || hash.startsWith(validHash));
         
         // Verificar si es la ruta de crear organización
@@ -25,6 +27,8 @@ export default function Home() {
         
         if (isCreateOrgRoute && currentUser) {
           setCurrentPage('create-organization');
+        } else if (isConceptoCreativoRoute && currentUser) {
+      setCurrentPage('dashboard');
         } else if (isDashboardRoute && currentUser) {
           setCurrentPage('dashboard');
           // Limpiar parámetros de autenticación de la URL si existen
@@ -49,7 +53,8 @@ export default function Home() {
 
     const checkHash = () => {
       const hash = window.location.hash;
-      const validDashboardHashes = ['#dashboard', '#organizaciones', '#concepto-creativo', '#pacientes'];
+      const validDashboardHashes = ['#dashboard', '#organizaciones', '#pacientes'];
+      const isConceptoCreativoRoute = hash === '#concepto-creativo';
       const isDashboardRoute = validDashboardHashes.some(validHash => hash === validHash || hash.startsWith(validHash));
       const isCreateOrgRoute = hash === '#create-organization' || window.location.pathname === '/create-organization';
       
@@ -58,6 +63,17 @@ export default function Home() {
         authService.getCurrentUser().then(currentUser => {
           if (currentUser) {
             setCurrentPage('create-organization');
+          } else {
+            // Redirigir al landing si no está autenticado
+            window.history.replaceState(null, '', window.location.pathname);
+            setCurrentPage('landing');
+          }
+        });
+      } else if (isConceptoCreativoRoute) {
+        // Verificar autenticación para concepto creativo
+        authService.getCurrentUser().then(currentUser => {
+          if (currentUser) {
+            setCurrentPage('dashboard');
           } else {
             // Redirigir al landing si no está autenticado
             window.history.replaceState(null, '', window.location.pathname);
@@ -139,6 +155,8 @@ export default function Home() {
       return <DashboardPage />;
     case 'create-organization':
       return <CreateOrganizationPage />;
+    case 'concepto-creativo':
+      return <DashboardPage />;
     default:
       return <LandingPage />;
   }
